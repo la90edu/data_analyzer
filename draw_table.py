@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import anigmas
+import llm_gpt
 
 def draw_analyzed_table(df,table_name):
     
@@ -20,5 +21,7 @@ def draw_analyzed_table(df,table_name):
 
 # יצירת DataFrame מהנתונים
     df = pd.DataFrame(data, columns=["anigma", "mean", "var"])
-
     st.dataframe(df)
+    
+    text=llm_gpt.return_llm_answer(df)
+    st.write(text)
