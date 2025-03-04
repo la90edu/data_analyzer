@@ -16,8 +16,8 @@ def draw_graph_gauge(name,value,avg_national,avg_research):
         gauge={
             'axis': {'range': [1, 5]},
             'steps': [
-                {'range': [avg_national - 0.05, avg_national + 0.05], 'color': "purple"},
-                {'range': [avg_research - 0.05, avg_research + 0.05], 'color': "cyan"}
+                {'range': [avg_national - 0.05, avg_national + 0.05], 'color': "blue"},
+                {'range': [avg_research - 0.05, avg_research + 0.05], 'color': "orange"}
             ],
             'bar': {'color': "green", 'thickness': 0.3}
         }
@@ -25,13 +25,13 @@ def draw_graph_gauge(name,value,avg_national,avg_research):
 
     # הוספת מקרא מותאם אישית
     legend_items = [
-        {'color': 'purple', 'label': 'ממוצע ארצי'},
-        {'color': 'cyan', 'label': 'ממוצע מחקרי'}
+        {'color': 'blue', 'label': f'{avg_national:.2f} :   ממוצע ארצי'},
+        {'color': 'orange', 'label': f'{avg_research} :ממוצע מחקרי'}
     ]
 
     #  מיקום התחלתי של המקרא
     legend_x = 0.95
-    legend_y = 0.95
+    legend_y = 0.90
     box_size = 0.02  # גודל הריבוע
 
     for item in legend_items:

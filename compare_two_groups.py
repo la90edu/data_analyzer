@@ -4,7 +4,6 @@ from class_school_info import SchoolInfo
 import plotly.graph_objects as go
 
 def comare_two_groups_show_graphs(df1,group1_name,df2,group2_name):
-    st.write(f"### {group1_name} vs {group2_name}")
     
     schoolInfo1 = SchoolInfo(df1)
     fig_ici1=schoolInfo1.get_fig_ici("ici")

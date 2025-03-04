@@ -11,6 +11,6 @@ df_non_jews = df[df['school'].isin(non_jews_schools)]
 df_jews = df[~df['school'].isin(non_jews_schools)]
 
 
-compare_two_groups.comare_two_groups_show_graphs(df_jews,"יהודים",df_non_jews,"לא יהודים")
-st.dataframe(df_jews)
+compare_two_groups.comare_two_groups_show_graphs(df_jews,"יהודים",df_non_jews,"אינם יהודים")
+# st.dataframe(df_jews)
 

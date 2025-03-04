@@ -62,27 +62,31 @@ def draw_spider_graph(name, current_averages, global_averages, research_averager
 
     fig = go.Figure()
 
-    fig.add_trace(go.Scatterpolar(
-        r=lst_current,
-        theta=categories,
-        fill='toself',
-        name='Current',
-        line=dict(color="blue")  # צבע ייחודי למקרא
-    ))
+    
+
     fig.add_trace(go.Scatterpolar(
         r=lst_global,
         theta=categories,
         fill='toself',
         name='Global',
-        line=dict(color="red")  # צבע ייחודי למקרא
+        line=dict(color="blue")  # צבע ייחודי למקרא
     ))
+    fig.add_trace(go.Scatterpolar(
+        r=lst_current,
+        theta=categories,
+        fill='toself',
+        name='Current',
+        line=dict(color="green")  # צבע ייחודי למקרא
+    ))
+    
     fig.add_trace(go.Scatterpolar(
         r=lst_research,
         theta=categories,
         fill='toself',
         name='Research ',
-        line=dict(color="green")  # צבע ייחודי למקרא
+        line=dict(color="orange")  # צבע ייחודי למקרא
     ))
+
 
     fig.update_layout(
         polar=dict(

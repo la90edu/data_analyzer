@@ -10,5 +10,5 @@ df_male=df[df['gender'] == 'male']
 compare_two_groups.comare_two_groups_show_graphs(df_female,"נערות",df_male,"נערים")
 
 
-st.dataframe(df_female)
-st.dataframe(df_male)
+# st.dataframe(df_female)
+# st.dataframe(df_male)
