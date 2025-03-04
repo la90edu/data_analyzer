@@ -8,7 +8,7 @@ def dict_to_list(dict):
     lst.append(dict["future_positive_past"])
     lst.append(dict["future_fatalic_present"])
     lst.append(dict["future_hedonistic_present"])
-    lst.append(["future_future"])
+    lst.append(dict["future_future"])
     return lst
 
 # def draw_spider_graph(name, current_averages,global_averages,research_avaragers):
@@ -57,8 +57,8 @@ def draw_spider_graph(name, current_averages, global_averages, research_averager
     lst_global = dict_to_list(global_averages)
     lst_research = dict_to_list(research_averagers)
 
-    categories = ["future_negetive_past", "future_positive_past", "future_fatalic_present",
-                  "future_hedonistic_present", "future_future"]
+    categories = ["תפיסת עבר מעכבת", "עבר כתשתית חיובית", "דטרמינסטיות",
+                  "סיפוק מיידי", "עתיד"]
 
     fig = go.Figure()
 
@@ -80,7 +80,7 @@ def draw_spider_graph(name, current_averages, global_averages, research_averager
         r=lst_research,
         theta=categories,
         fill='toself',
-        name='Research C',
+        name='Research ',
         line=dict(color="green")  # צבע ייחודי למקרא
     ))
 

@@ -6,17 +6,20 @@ import plotly.graph_objects as go
 import consts
 from class_school_info import SchoolInfo
 import plotly
+import init
 
-st.set_page_config(layout="wide")
-st.title('ניתוח ציר מנטלי ')
+
+# st.set_page_config(layout="wide")
+# st.title('ניתוח ציר מנטלי ')
 
 #init data
-data=connect_to_google_sheet.return_data()
-df=pd.DataFrame(data)
+# data=connect_to_google_sheet.return_data()
+# df=pd.DataFrame(data)
 
 #init global and research average
-consts.init_st_session_global_average_and_research_average(df)
-
+# consts.init_st_session_global_average_and_research_average(df)
+df=init.init()
+st.title('ניתוח ציר מנטלי ')
 
 unique_schools = df["school"].unique().tolist()
 school = st.selectbox('Select a school', unique_schools)
@@ -26,11 +29,8 @@ fig_ici=schoolInfo.get_fig_ici("ici")
 fig_risc=schoolInfo.get_fig_risc("risc")
 fig_spider=schoolInfo.get_fig_spider()
 
-# st.plotly_chart(fig_ici, key="unique_key_ici")
-# st.plotly_chart(fig_risc, key="unique_key_risc")
-# st.plotly_chart(fig_spider, key="unique_key_spider")
 
-import streamlit as st
+
 
 # יצירת שלוש עמודות
 col1, col2,col3 = st.columns(3)

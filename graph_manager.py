@@ -5,14 +5,14 @@ import streamlit as st
 class Gauge_Graph_type:
     def __init__(self,anigma_type, name, value):
         if anigma_type=="ici":
-            self.name = "ICI"
             self.name = name
+            self.name = "מיקוד שליטה פנימי"
             self.value = value
             self.global_average = st.session_state.global_average["ici"]
             self.research_average = st.session_state.research_average["ici"]
         elif anigma_type=="risc":
-            self.name = "RISC"
             self.name = name
+            self.name = "חוסן"
             self.value = value
             self.global_average = st.session_state.global_average["risc"]
             self.research_average = st.session_state.research_average["risc"]
