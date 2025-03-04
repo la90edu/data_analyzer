@@ -12,7 +12,7 @@ def draw_graph_gauge(name,value,avg_national,avg_research):
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=value,
-        title={'text': f"<b>{name}</b>", 'font': {'size': 24}},
+        # title={'text': f"<b>{name}</b>", 'font': {'size': 24}},
         gauge={
             'axis': {'range': [1, 5]},
             'steps': [
@@ -22,6 +22,21 @@ def draw_graph_gauge(name,value,avg_national,avg_research):
             'bar': {'color': "green", 'thickness': 0.3}
         }
     ))
+    
+    # הוספת margin ב-layout
+    fig.update_layout(
+    title={
+        'text': f"<b>{name}</b>",
+        'x': 1,  # מצמיד את הכותרת לימין
+        'xanchor': 'right',  # מוודא שהכותרת תתמקם בצד ימין
+        'font': {
+            'family': 'Arial',  # הפונט ברירת מחדל של Plotly
+            'color': '#7f7f7f',  # אפור כהה יותר כפי ש-Plotly משתמש
+            'size': 20  # אפשר לשנות את הגודל אם צריך
+        }
+    },
+    margin={'t': 100}  # Adds space at the top of the graph
+    )
 
     # הוספת מקרא מותאם אישית
     legend_items = [
