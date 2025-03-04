@@ -33,18 +33,14 @@ fig_spider=schoolInfo.get_fig_spider()
 
 
 # יצירת שלוש עמודות
-col1, col2 = st.columns([3, 2])
+col1, col2 = st.columns(2)
 # הצגת כל גרף בתוך עמודה משלו
 with col1:
-    col_1, col_2 = st.columns(2)
-    with col_1: 
         st.plotly_chart(fig_ici, key="unique_key_ici", use_container_width=True)
-    with col_2:
+with col2:
         st.plotly_chart(fig_risc, key="unique_key_risc", use_container_width=True)
 
-
-with col2:
-    st.plotly_chart(fig_spider, key="unique_key_spider", use_container_width=True)
+st.plotly_chart(fig_spider, key="unique_key_spider", use_container_width=True)
     
 
 # school_mean=schoolInfo.ici_result_mean()

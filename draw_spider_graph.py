@@ -68,14 +68,14 @@ def draw_spider_graph(name, current_averages, global_averages, research_averager
         r=lst_global,
         theta=categories,
         fill='toself',
-        name='Global',
+        name='ממוצע ארצי',
         line=dict(color="blue")  # צבע ייחודי למקרא
     ))
     fig.add_trace(go.Scatterpolar(
         r=lst_current,
         theta=categories,
         fill='toself',
-        name='Current',
+        name='ממוצע נוכחי',
         line=dict(color="green")  # צבע ייחודי למקרא
     ))
     
@@ -83,7 +83,7 @@ def draw_spider_graph(name, current_averages, global_averages, research_averager
         r=lst_research,
         theta=categories,
         fill='toself',
-        name='Research ',
+        name='ממוצע מחקרי ',
         line=dict(color="orange")  # צבע ייחודי למקרא
     ))
 
