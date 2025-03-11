@@ -36,3 +36,25 @@ class Spider_Graph_type:
         fig= draw_spider_graph.draw_spider_graph(self.name, self.school_info_current, self.school_info_global, self.school_info_research)    
         return fig
         
+        
+class Bar_Chart_Graph_type:
+    def __init__(self,name,anigma_type,*args):
+        self.name = name
+        self.anigma_type = anigma_type
+        self.dicts = self.create_list_of_dicts(*args)
+        
+    def create_list_of_dicts(self,*args):
+        data_list = []
+    
+        # נוודא שהארגומנטים מגיעים בזוגות (שם, ערך)
+        if len(args) % 2 != 0:
+            raise ValueError("Arguments must be in pairs: (key1, value1, key2, value2, ...)")
+    
+        # ריצה על כל שני איברים (שם וערך)
+        for i in range(0, len(args), 2):
+            value = args[i][self.anigma_type]
+            name = args[i + 1]
+            data_list.append({value: name})  # יצירת מילון והכנסה לרשימה
+    
+        return data_list
+    
