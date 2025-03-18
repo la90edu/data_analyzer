@@ -18,13 +18,12 @@ def comare_two_groups_show_graphs(df1,group1_name,df2,group2_name):
     # יצירת שלוש עמודות
     col1, col2 = st.columns(2)
     with col1:
-        st.title(group1_name)
+        st.markdown(f"<h1 style='text-align: center;'>{group1_name}</h1>", unsafe_allow_html=True)
         st.plotly_chart(fig_ici1, key="unique_key_ici1", use_container_width=True)
         st.plotly_chart(fig_risc1, key="unique_key_risc1", use_container_width=True)
         st.plotly_chart(fig_spider1, key="unique_key_spider1", use_container_width=True)
     with col2:
-        st.title(group2_name)
+        st.markdown(f"<h1 style='text-align: center;'>{group2_name}</h1>", unsafe_allow_html=True)
         st.plotly_chart(fig_ici2, key="unique_key_ici2", use_container_width=True)
         st.plotly_chart(fig_risc2, key="unique_key_risc2", use_container_width=True)
         st.plotly_chart(fig_spider2, key="unique_key_spider2", use_container_width=True)
-    

@@ -4,6 +4,12 @@ from class_school_info import SchoolInfo
 import streamlit as st
 
 
+colors = {
+    "current_color": "#FF5733",
+    "global_color": "#33FF57",
+    "research_color": "#5733FF"
+}
+
 research_average={
     "ici":3.71,
     "risc":3.22,

@@ -2,7 +2,8 @@ import pandas as pd
 import anigmas
 import draw_gauge
 import plotly
-from graph_manager import Gauge_Graph_type, Spider_Graph_type                     
+from graph_manager import Gauge_Graph_type, Spider_Graph_type   
+import streamlit as st                  
 
 class SchoolInfo:
   def __init__(self,df):
@@ -14,6 +15,17 @@ class SchoolInfo:
     self.future_fatalic_present=anigmas.future_fatalic_present_result(df)
     self.future_hedonistic_present=anigmas.future_hedonistic_present_result(df)
     self.future_future=anigmas.future_future_result(df)
+    
+    
+    # self.ici_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("ici")
+    # self.risc_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("risc")
+    # self.future_negetive_past_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("future_negetive_past")
+    # self.future_positive_past_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("future_positive_past")
+    # self.future_fatalic_present_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("future_fatalic_present")
+    # self.future_hedonistic_present_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("future_hedonistic_present")
+    # self.future_future_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("future_future")
+    
+    
     
   
 #   def __ici_result_mean(self):
@@ -41,16 +53,30 @@ class SchoolInfo:
             "future_hedonistic_present":self.future_hedonistic_present,
             "future_future":self.future_future
         }
-        # result= {
-        #     "ici":self.__ici_result_mean(),
-        #     "risc":self.__risc_result_mean(),
-        #     "future_negetive_past":self.__future_negetive_past_result_mean(),
-        #     "future_positive_past":self.__future_positive_past_result_mean(),
-        #     "future_fatalic_present":self.__future_fatalic_present_result_mean(),
-        #     "future_hedonistic_present":self.__future_hedonistic_present_result_mean(),
-        #     "future_future":self.__future_future_result_mean()
-        # }
         return result
+    
+  def return_delta_from_global_as_dict(self):
+        result= {
+            "ici":self.get_precentage_diffrent_from_global_anigmas("ici"),
+            "risc":self.get_precentage_diffrent_from_global_anigmas("risc"),
+            "future_negetive_past":self.get_precentage_diffrent_from_global_anigmas("future_negetive_past"),
+            "future_positive_past":self.get_precentage_diffrent_from_global_anigmas("future_positive_past"),
+            "future_fatalic_present":self.get_precentage_diffrent_from_global_anigmas("future_fatalic_present"),
+            "future_hedonistic_present":self.get_precentage_diffrent_from_global_anigmas("future_hedonistic_present"),
+            "future_future":self.get_precentage_diffrent_from_global_anigmas("future_future")
+        }
+        return result
+  
+  def return_biggest_delata_from_global(self):
+        delta_dict=self.return_delta_from_global_as_dict()
+        max_key = max(delta_dict, key=lambda k: abs(delta_dict[k]))
+        return max_key
+
+  def print_anigma_result(self):
+        anigma_max_abs=self.return_biggest_delata_from_global()
+        anigmas.get_max_average_higed_from_anigma(self.df,anigma_max_abs)
+        
+        
 
     
   
@@ -70,6 +96,10 @@ class SchoolInfo:
       fig=graph.get_fig()
       return fig
   
+  def get_precentage_diffrent_from_global_anigmas(self,anigma_name):
+        global_anigmas=st.session_state.global_average
+        return((self.return_anigmas_result_as_dict()[anigma_name]-global_anigmas[anigma_name])/global_anigmas[anigma_name])
+        
     
     
     

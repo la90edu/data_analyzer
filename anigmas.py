@@ -2,6 +2,40 @@ import pandas as pd
 import actions
 import streamlit as st
 
+def cut_df(df,anigma_name):
+   match anigma_name:
+        case "ici":
+            cols=('heg_1','heg_5','heg_10','heg_12','heg_24','heg_26')
+        case "risc":
+            cols=("heg_4","heg_14","heg_18","heg_19")
+        case "future_negetive_past":
+            cols=('heg_2','heg_13','heg_23')
+        case "future_positive_past":
+            cols=('heg_6','heg_16','heg_21')
+        case "future_fatalic_present":
+            cols=('heg_3','heg_15','heg_22')
+        case "future_hedonistic_present":
+            cols=('heg_11','heg_17','heg_25')
+        case "future_future":
+            cols=('heg_7','heg_8','heg_9','heg_27')
+        case _:
+            print("anigma name not found")
+            
+   df_cuted = df.filter(items=cols)
+   return df_cuted
+
+def get_max_average_higed_from_anigma(df,anigma_name):
+    df_cuted=cut_df(df,anigma_name)
+    result=actions.return_sum_dict(df_cuted)
+    st.write(f"chosen anigma:{anigma_name}")
+    st.write(result)
+    st.dataframe(df)
+    return result
+
+
+            
+             
+    
 def ici_result(df):
     ici_cols=('heg_1','heg_5','heg_10','heg_12','heg_24','heg_26')
     df_ici = df.filter(items=ici_cols)

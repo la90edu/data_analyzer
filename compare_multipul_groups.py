@@ -4,7 +4,7 @@ from class_school_info import SchoolInfo
 import plotly.graph_objects as go
 import graph_manager
 
-def comare_multipul_groups(df1,group1_name,df2,group2_name,df3,group3_name,df4,group4_name,df5,group5_name,df6,group6_name):
+def show_comare_multipul_groups_lamas(name,anigma_type,df1,group1_name,df2,group2_name,df3,group3_name,df4,group4_name,df5,group5_name,df6,group6_name):
     
     dict1 = SchoolInfo(df1).return_anigmas_result_as_dict()
     dict2 = SchoolInfo(df2).return_anigmas_result_as_dict()
@@ -13,8 +13,12 @@ def comare_multipul_groups(df1,group1_name,df2,group2_name,df3,group3_name,df4,g
     dict5 = SchoolInfo(df5).return_anigmas_result_as_dict()
     dict6 = SchoolInfo(df6).return_anigmas_result_as_dict()
     
-    bar_graph=graph_manager.Bar_Chart_Graph_type("ici","ici",dict1,group1_name,dict2,group2_name,dict3,group3_name,dict4,group4_name,dict5,group5_name,dict6,group6_name) 
+    bar_graph=graph_manager.Bar_Chart_Graph_type(name,anigma_type,dict1,group1_name,dict2,group2_name,dict3,group3_name,dict4,group4_name,dict5,group5_name,dict6,group6_name) 
+    fig=bar_graph.make_fig()
+    st.plotly_chart(fig, use_container_width=True)    
+
     
+    #st.plotly_chart(bar_graph, key="unique_key_bar", use_container_width=True)
     # fig_ici1=schoolInfo1.get_fig_ici("ici")
     # fig_risc1=schoolInfo1.get_fig_risc("risc")
     # fig_spider1=schoolInfo1.get_fig_spider()
@@ -37,3 +41,18 @@ def comare_multipul_groups(df1,group1_name,df2,group2_name,df3,group3_name,df4,g
     #     st.plotly_chart(fig_risc2, key="unique_key_risc2", use_container_width=True)
     #     st.plotly_chart(fig_spider2, key="unique_key_spider2", use_container_width=True)
     
+    
+def show_comare_multipul_groups_tipoh(name,anigma_type,df1,group1_name,df2,group2_name,df3,group3_name,df4,group4_name,df5,group5_name,df6,group6_name,df7,group7_name):
+    
+    dict1 = SchoolInfo(df1).return_anigmas_result_as_dict()
+    dict2 = SchoolInfo(df2).return_anigmas_result_as_dict()
+    dict3 = SchoolInfo(df3).return_anigmas_result_as_dict()
+    dict4 = SchoolInfo(df4).return_anigmas_result_as_dict()
+    dict5 = SchoolInfo(df5).return_anigmas_result_as_dict()
+    dict6 = SchoolInfo(df6).return_anigmas_result_as_dict()
+    dict7 = SchoolInfo(df7).return_anigmas_result_as_dict()
+    
+    
+    bar_graph=graph_manager.Bar_Chart_Graph_type(name,anigma_type,dict1,group1_name,dict2,group2_name,dict3,group3_name,dict4,group4_name,dict5,group5_name,dict6,group6_name,dict7,group7_name) 
+    fig=bar_graph.make_fig()
+    st.plotly_chart(fig, use_container_width=True)    

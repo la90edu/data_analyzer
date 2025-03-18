@@ -1,6 +1,7 @@
 import draw_gauge
 import draw_spider_graph
 import streamlit as st
+import draw_bar_chart
 
 class Gauge_Graph_type:
     def __init__(self,anigma_type, name, value):
@@ -41,6 +42,8 @@ class Bar_Chart_Graph_type:
     def __init__(self,name,anigma_type,*args):
         self.name = name
         self.anigma_type = anigma_type
+        self.reserch_average = st.session_state.research_average[anigma_type]
+        self.global_average = st.session_state.global_average[anigma_type]
         self.dicts = self.create_list_of_dicts(*args)
         
     def create_list_of_dicts(self,*args):
@@ -54,7 +57,11 @@ class Bar_Chart_Graph_type:
         for i in range(0, len(args), 2):
             value = args[i][self.anigma_type]
             name = args[i + 1]
-            data_list.append({value: name})  # יצירת מילון והכנסה לרשימה
+            data_list.append({"name":name,"value": value})  # יצירת מילון והכנסה לרשימה
     
         return data_list
     
+    def make_fig(self):
+        #reserarch shoil be first
+        fig=draw_bar_chart.draw_bar_chart(self.name, self.dicts, self.reserch_average, "ממוצע מחקרי", self.global_average, "ממוצע ארצי")
+        return fig
