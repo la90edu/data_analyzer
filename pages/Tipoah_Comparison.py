@@ -1,3 +1,7 @@
+"""
+# השוואה בין ממדי טיפוח 
+"""
+
 import streamlit as st
 import pandas as pd
 import init

@@ -1,3 +1,7 @@
+"""
+# ניתוח על פי בית ספר
+# """
+
 import streamlit as st
 import pandas as pd
 import draw_table
