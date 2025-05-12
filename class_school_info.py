@@ -3,7 +3,8 @@ import anigmas
 import draw_gauge
 import plotly
 from graph_manager import Gauge_Graph_type, Spider_Graph_type   
-import streamlit as st                  
+import streamlit as st   
+import texts               
 
 class SchoolInfo:
   def __init__(self,df):
@@ -15,33 +16,15 @@ class SchoolInfo:
     self.future_fatalic_present=anigmas.future_fatalic_present_result(df)
     self.future_hedonistic_present=anigmas.future_hedonistic_present_result(df)
     self.future_future=anigmas.future_future_result(df)
+
+    self.worst_anigma=self.return_biggest_delata_from_global_positive_wrost_anigma()[0]
+    self.worst_anigma_value=self.return_biggest_delata_from_global_positive_wrost_anigma()[1]
+    self.worst_anigma_name=texts.return_translate_anigma_name(self,self.worst_anigma)
+    self.best_anigma=self.return_biggest_delata_from_global_negetive_best_anigma()[0]
+    self.best_anigma_value=self.return_biggest_delata_from_global_negetive_best_anigma()[1]
+    self.best_anigma_name=texts.return_translate_anigma_name(self,self.best_anigma)
     
     
-    # self.ici_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("ici")
-    # self.risc_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("risc")
-    # self.future_negetive_past_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("future_negetive_past")
-    # self.future_positive_past_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("future_positive_past")
-    # self.future_fatalic_present_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("future_fatalic_present")
-    # self.future_hedonistic_present_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("future_hedonistic_present")
-    # self.future_future_delta_from_global=self.get_precentage_diffrent_from_global_anigmas("future_future")
-    
-    
-    
-  
-#   def __ici_result_mean(self):
-#       return float(anigmas.ici_result(self.df))
-#   def __risc_result_mean(self):
-#       return float(anigmas.risc_result(self.df))
-#   def __future_negetive_past_result_mean(self):
-#       return float(anigmas.future_negetive_past_result(self.df))
-#   def __future_positive_past_result_mean(self):
-#         return float(anigmas.future_positive_past_result(self.df))
-#   def __future_fatalic_present_result_mean(self):
-#         return float(anigmas.future_fatalic_present_result(self.df))
-#   def __future_hedonistic_present_result_mean(self):
-#         return float(anigmas.future_hedonistic_present_result(self.df))
-#   def __future_future_result_mean(self):
-#         return float(anigmas.future_future_result(self.df))
   
   def return_anigmas_result_as_dict(self):
         result= {
@@ -67,10 +50,24 @@ class SchoolInfo:
         }
         return result
   
-  def return_biggest_delata_from_global(self):
+  def return_biggest_delata_from_global_positive_wrost_anigma(self): # when global is bigger than local
         delta_dict=self.return_delta_from_global_as_dict()
-        max_key = max(delta_dict, key=lambda k: abs(delta_dict[k]))
-        return max_key
+        positive_delta_dict = {key: value for key, value in delta_dict.items() if value > 0}
+
+        #finds the max key from the positive delta dict
+        max_key = max(positive_delta_dict, key=positive_delta_dict.get)
+        max_value = positive_delta_dict[max_key]
+        
+        return max_key,max_value
+    
+  def return_biggest_delata_from_global_negetive_best_anigma(self): # when local is bigger than global
+        delta_dict=self.return_delta_from_global_as_dict()
+        negetive_delta_dict = {key: value for key, value in delta_dict.items() if value < 0}
+        
+        min_key = min(negetive_delta_dict, key=negetive_delta_dict.get)
+        min_value = negetive_delta_dict[min_key]
+        
+        return min_key,min_value
 
   def print_anigma_result(self):
         anigma_max_abs=self.return_biggest_delata_from_global()
@@ -98,8 +95,24 @@ class SchoolInfo:
   
   def get_precentage_diffrent_from_global_anigmas(self,anigma_name):
         global_anigmas=st.session_state.global_average
-        return((self.return_anigmas_result_as_dict()[anigma_name]-global_anigmas[anigma_name])/global_anigmas[anigma_name])
         
-    
-    
-    
+        local=self.return_anigmas_result_as_dict()[anigma_name]
+        global_=global_anigmas[anigma_name]
+        
+        delta=(global_-local)/global_
+        
+        return delta
+        # return((self.return_anigmas_result_as_dict()[anigma_name]-global_anigmas[anigma_name])/global_anigmas[anigma_name])
+        
+  
+  def return_worst_heg_according_to_wrost_anigma(self):
+        worst_heg=anigmas.return_wrost_heg_from_anigma_acoording_to_delta_from_global(self.df,self.worst_anigma) 
+        return worst_heg
+
+  def return_first_and_second_worst_heg_according_to_wrost_anigma(self):
+        key1,value1,key2,value2=anigmas.return_first_and_second_heg_for_worst_heg(self.df,self.worst_anigma)
+        key1_name=texts.return_translate_heg_name(key1)
+        key2_name=texts.return_translate_heg_name(key2) 
+        
+        return key1_name,value1,key2_name,value2
+        

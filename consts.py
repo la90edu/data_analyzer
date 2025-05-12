@@ -1,6 +1,5 @@
 import anigmas
 import pandas as pd
-from class_school_info import SchoolInfo
 import streamlit as st
 
 
@@ -25,9 +24,19 @@ def return_research_average():
     return research_average 
 
 def init_st_session_global_average_and_research_average(global_df):
-    global_average=SchoolInfo(global_df).return_anigmas_result_as_dict()
-    st.session_state.global_average=global_average
-    st.session_state.research_average=research_average
+    # יצירת מילון global_average ישירות מהפונקציות של anigmas במקום שימוש ב-SchoolInfo
+    global_average = {
+        "ici": float(anigmas.ici_result(global_df)),
+        "risc": float(anigmas.risc_result(global_df)),
+        "future_negetive_past": float(anigmas.future_negetive_past_result(global_df)),
+        "future_positive_past": float(anigmas.future_positive_past_result(global_df)),
+        "future_fatalic_present": float(anigmas.future_fatalic_present_result(global_df)),
+        "future_hedonistic_present": float(anigmas.future_hedonistic_present_result(global_df)),
+        "future_future": float(anigmas.future_future_result(global_df))
+    }
+    # אתחול המשתנים ב-session_state
+    st.session_state.global_average = global_average
+    st.session_state.research_average = research_average
     
     
 
@@ -38,3 +47,8 @@ def return_global_average(df):
     }
     
     return global_average
+
+def init_heg_avg(df):
+    heg_avg=anigmas.get_global_heg_avg_as_dict(df)
+    st.session_state.heg_avg=heg_avg
+    return heg_avg
