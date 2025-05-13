@@ -405,11 +405,9 @@ def main():
     
     # הצעות לשאלות למשתמש
     suggested_questions = [
-        "מה המצב של התלמידים מבחינת חוסן?",
-        "איך מיקוד השליטה הפנימי של בית הספר משתווה לממוצע הארצי?",
-        "איזה מדד תפיסת זמן הכי בולט לחיוב?",
-        "מה המשמעות של הנתונים בגרף הרדאר?",
-        "הכן דוח למנהל בית הספר"
+        "הכן דוח מנהל",
+        "מהן חוזקות בית הספר שלי?",
+        "מהן החולשות של בית הספר שלי ?"
     ]
     
     # ממשק משתמש שמראה הצעות לשאלות
@@ -428,7 +426,7 @@ def main():
             # מציגים את תשובת הצ'אטבוט עם סטרימינג בזמן אמת
             with st.chat_message("assistant"):
                 data = filtered_df.to_markdown() if not filtered_df.empty else "אין נתונים זמינים"
-                system_prompt = system_prompt #llm_system_massage_manager.get_first_system_prompt(data)
+                system_prompt = return_prompt(school_info) #llm_system_massage_manager.get_first_system_prompt(data)
                 
                 # שימוש בסטרימינג עבור שאלות דוגמה
                 response_stream = get_openai_response(

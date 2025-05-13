@@ -23,6 +23,7 @@ class SchoolInfo:
     self.best_anigma=self.return_biggest_delata_from_global_negetive_best_anigma()[0]
     self.best_anigma_value=self.return_biggest_delata_from_global_negetive_best_anigma()[1]
     self.best_anigma_name=texts.return_translate_anigma_name(self,self.best_anigma)
+    self.worst_heg1_text= self.return_first_and_second_worst_heg_according_to_wrost_anigma()[0]
     
     
   
@@ -115,4 +116,4 @@ class SchoolInfo:
         key2_name=texts.return_translate_heg_name(key2) 
         
         return key1_name,value1,key2_name,value2
-        
+
