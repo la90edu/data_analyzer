@@ -10,6 +10,7 @@ from openai import OpenAI
 
 # Import custom modules
 import llm_system_massage_manager
+import llm_gpt
 import draw_gauge
 import draw_spider_graph
 import draw_bar_chart
@@ -18,7 +19,7 @@ import consts
 import anigmas
 from class_school_info import SchoolInfo
 from graph_manager import Gauge_Graph_type, Spider_Graph_type, Bar_Chart_Graph_type
-from system_prompt import return_prompt
+from system_prompt import return_prompt,return_highlighted_text
 # טעינת משתני הסביבה מקובץ .env
 load_dotenv()
 
@@ -119,6 +120,8 @@ def init():
     consts.init_heg_avg(df)
     return df
 
+#knowledge_files=
+
 # Initialize session state for chat and graph data
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -139,61 +142,30 @@ def get_openai_response(prompt, system_prompt, history, graph_data, stream=False
         graph_summary += f"הנתונים שלהלן מתייחסים לבית הספר: {graph_data['selected_school']}\n\n"
     
     if graph_data["risc"] is not None:
-        graph_summary += f"נתוני גרף חוסן (RISC):\n"
+        graph_summary += f"נתוני גרף חוסן :\n"
         graph_summary += f"ערך נוכחי: {graph_data['risc']['value']:.2f}\n"
         graph_summary += f"ממוצע ארצי: {graph_data['risc']['global_avg']:.2f}\n"
-        graph_summary += f"ממוצע מחקרי: {graph_data['risc']['research_avg']:.2f}\n\n"
+        #graph_summary += f"ממוצע מחקרי: {graph_data['risc']['research_avg']:.2f}\n\n"
         
     if graph_data["ici"] is not None:
         graph_summary += f"נתוני גרף מיקוד שליטה פנימי (ICI):\n"
         graph_summary += f"ערך נוכחי: {graph_data['ici']['value']:.2f}\n"
         graph_summary += f"ממוצע ארצי: {graph_data['ici']['global_avg']:.2f}\n"
-        graph_summary += f"ממוצע מחקרי: {graph_data['ici']['research_avg']:.2f}\n\n"
+       # graph_summary += f"ממוצע מחקרי: {graph_data['ici']['research_avg']:.2f}\n\n"
         
     if graph_data["spider"] is not None:
-        graph_summary += f"נתוני גרף רדאר (Spider) לתפיסות זמן:\n"
+        graph_summary += f"לתפיסות זמן:\n"
         
         for category, values in graph_data["spider"].items():
             formatted_category = category.replace("future_", "").replace("_past", "").replace("_present", "")
             graph_summary += f"קטגוריה: {formatted_category}\n"
             graph_summary += f"  ערך נוכחי: {values['current']:.2f}\n"
             graph_summary += f"  ממוצע ארצי: {values['global']:.2f}\n"
-            graph_summary += f"  ממוצע מחקרי: {values['research']:.2f}\n"
+            #graph_summary += f"  ממוצע מחקרי: {values['research']:.2f}\n"
     
     # הוספת הנחיות ספציפיות לגרפים בפרומפט המערכת
     graph_system_prompt = system_prompt + ""
 
-# תוספת חשובה: מעתה עליך להתייחס גם לנתוני הגרפים המוצגים למשתמש ולאפשר ניתוח מעמיק של הנתונים החזותיים. כאשר המשתמש שואל שאלות לגבי הגרפים, עליך לנתח את הנתונים ולספק תובנות רלוונטיות.
-
-# להלן סוגי הגרפים המוצגים למשתמש:
-# 1. גרף חוסן (RISC) - מראה את רמת החוסן הנפשי של בית הספר בהשוואה לממוצע ארצי וממוצע מחקרי.
-# 2. גרף מיקוד שליטה פנימי (ICI) - מראה את רמת מיקוד השליטה הפנימי של בית הספר בהשוואה לממוצע ארצי ומחקרי.
-# 3. גרף רדאר (Spider) - מראה את תפיסות הזמן השונות של בית הספר (עבר חיובי, עבר שלילי, הווה הדוניסטי, הווה פאטאלי, עתיד).
-
-# כאשר אתה מנתח את הגרפים, שים לב:
-# - השוואה בין הערך הנוכחי לממוצעים - האם בית הספר גבוה/נמוך מהממוצע?
-# - מגמות בולטות - האם יש מדדים שבהם בית הספר בולט במיוחד לטובה או לרעה?
-# - קשרים בין המדדים השונים - האם יש קשר בין חוסן נמוך לתפיסת זמן מסוימת?
-# - המלצות מעשיות להתערבות - מה אפשר לעשות כדי לשפר את המדדים הנמוכים?
-
-# כמו כן, אם המשתמש מבקש דוח למנהל בית ספר, צור טקסט מותאם למנהל/ת בית ספר על בסיס התבנית הבאה, תוך החלפת [שם בית הספר] בשם בית הספר המסוים, והתאמת התוכן לפי סוג ורמת התוצאות שהתקבלו בשלושת המדדים הבאים: מיקוד שליטה פנימי, חוסן, ותפיסת זמן.
-
-# הטקסט צריך לכלול:
-# 1. פתיחה שמציגה את תכנית "הציר המנטלי" והשאלון שמילאו התלמידים
-# 2. אזכור של המדדים התיאורטיים (מיקוד שליטה פנימי, חוסן, ותפיסת זמן) עם אזכור מלא של המאמרים הספציפיים הבאים:
-#    - מיקוד שליטה פנימי ע"פ התיאוריה של נוביצקי וסטריקלנד (Nowicki, S., & Strickland, B. R. (1973). A locus of control scale for children. *Journal of Consulting and Clinical Psychology, 40*(1), 148-154)
-#    - חוסן והתמודדות עם אתגרים ע"פ קונור ודוידסון (Connor, K. M., & Davidson, J. R. T. (2003). Development of a new resilience scale: The Connor-Davidson Resilience Scale (CD-RISC). *Depression and Anxiety, 18*(2), 76-82)
-#    - תפיסת זמן של זימברדו ובויד ע"פ (Zimbardo, P. G., & Boyd, J. N. (1999). Putting time in perspective: A valid, reliable individual-differences metric. *Journal of Personality and Social Psychology, 77*(6), 1271-1288)
-# 3. התייחסות לתוצאות הספציפיות של בית הספר יחסית לממוצע הארצי, תוך שימוש בסקאלה הבאה:
-#    * 0-9% מתחת/מעל לממוצע = "מעט מתחת/מעל לממוצע"
-#    * 10-19% מתחת/מעל לממוצע = "מתחת/מעל לממוצע במידה מסוימת"
-#    * 20%+ מתחת/מעל לממוצע = "מתחת/מעל לממוצע באופן משמעותי"
-# 4. התייחסות חיובית ומעצימה למדד הגבוה ביותר (או לפחות בממוצע)
-# 5. שאלות ממוקדות לחשיבה בהתאם למדד שבו בית הספר נמצא בתוצאה החלשה ביותר
-# 6. סיום המזמין להתבוננות משותפת ופעולה
-
-# חשוב מאוד: פרמט את כל תשובותיך ב-Markdown. השתמש בכותרות (#, ##), רשימות (*, -), הדגשות (**טקסט מודגש**), טבלאות ואלמנטים אחרים של Markdown כדי להפוך את התשובה שלך לברורה, מאורגנת ונוחה לקריאה.
-# """
     
     # הוספת תקציר הגרפים לפרומפט המשתמש
     user_prompt = f"""history: {history}
@@ -287,7 +259,7 @@ def main():
     if filtered_df.empty:
         # Sample data for demonstration
         with row1_col1:
-            st.markdown("### מדד חוסן")
+            st.markdown(" מדד חוסן")
             fig1 = generate_sample_gauge()
             st.plotly_chart(fig1, use_container_width=True)
             
@@ -395,9 +367,10 @@ def main():
     # Chatbot section with API key information
     st.markdown("### צ'אטבוט לניתוח נתונים 🤖")
     
+    short=llm_gpt.return_llm_answer(return_highlighted_text(school_info),"","")
     # Show API status
     if api_key:
-        st.success("חיבור ל-OpenAI API פעיל")
+        st.success(short)
     else:
         st.warning("לא נמצא API key של OpenAI. הצ'אטבוט עשוי לא לפעול כראוי.")
     
@@ -406,8 +379,6 @@ def main():
     # הצעות לשאלות למשתמש
     suggested_questions = [
         "הכן דוח מנהל",
-        "מהן חוזקות בית הספר שלי?",
-        "מהן החולשות של בית הספר שלי ?"
     ]
     
     # ממשק משתמש שמראה הצעות לשאלות
