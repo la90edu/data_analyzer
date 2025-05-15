@@ -6,11 +6,10 @@ import plotly.express as px
 import time
 import os
 from dotenv import load_dotenv
-from openai import OpenAI
+from anthropic import Anthropic
 
 # Import custom modules
 import llm_system_massage_manager
-import llm_gpt
 import draw_gauge
 import draw_spider_graph
 import draw_bar_chart
@@ -19,16 +18,16 @@ import consts
 import anigmas
 from class_school_info import SchoolInfo
 from graph_manager import Gauge_Graph_type, Spider_Graph_type, Bar_Chart_Graph_type
-from system_prompt import return_prompt,return_highlighted_text
+from system_prompt import return_prompt
 # טעינת משתני הסביבה מקובץ .env
 load_dotenv()
 
 # קבלת ה-API key מהמשתנים והגדרת הלקוח
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("ANTHROPIC_API_KEY")
 if api_key:
-    openai_client = OpenAI(api_key=api_key)
+    anthropic_client = Anthropic(api_key=api_key)
 else:
-    openai_client = OpenAI()  # יתכן שיעבוד אם יש API key בסביבה
+    anthropic_client = Anthropic()  # יתכן שיעבוד אם יש API key בסביבה
 
 # Page Configuration
 st.set_page_config(
@@ -71,34 +70,7 @@ st.markdown(
         height: 100%;
     }
     
-    /* Sidebar styling - הגבלת רוחב ה-sidebar */
-    [data-testid="stSidebar"] {
-        min-width: 200px !important;
-        max-width: 200px !important;
-        width: 200px !important;
-    }
-    
-    /* ביטול מרווחים מיותרים בסרגל הצד */
-    [data-testid="stSidebar"] > div:first-child {
-        padding-top: 1rem;
-        padding-right: 1rem;
-        padding-left: 1rem;
-    }
-    
-    /* שיפור גודל העמודות למניעת דחיסה של הגרפים */
-    .row-widget.stButton, [data-testid="stVerticalBlock"] > div {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    
-    /* וידוא שהגרפים מקבלים את הרוחב המתאים */
-    [data-testid="column"] {
-        width: auto !important;
-        min-width: 0;
-        flex: 1;
-    }
-    
-    /* Sidebar styling לקלאס הקודם */
+    /* Sidebar styling */
     .css-1d391kg {
         text-align: right;
         direction: rtl;
@@ -161,8 +133,8 @@ if "graph_data" not in st.session_state:
         "selected_school": None
     }
 
-# הפונקציה המשופרת לקבלת תשובה מ-OpenAI עם תמיכה בנתוני הגרפים ובסטרימינג
-def get_openai_response(prompt, system_prompt, history, graph_data, stream=False):
+# הפונקציה המשופרת לקבלת תשובה מ-Claude עם תמיכה בנתוני הגרפים ובסטרימינג
+def get_anthropic_response(prompt, system_prompt, history, graph_data, stream=False):
     # יצירת תקציר של נתוני הגרפים כדי להעביר אותם לצ'אטבוט
     graph_summary = ""
     if graph_data["selected_school"]:
@@ -190,10 +162,6 @@ def get_openai_response(prompt, system_prompt, history, graph_data, stream=False
             graph_summary += f"  ממוצע ארצי: {values['global']:.2f}\n"
             #graph_summary += f"  ממוצע מחקרי: {values['research']:.2f}\n"
     
-    # הוספת הנחיות ספציפיות לגרפים בפרומפט המערכת
-    graph_system_prompt = system_prompt + ""
-
-    
     # הוספת תקציר הגרפים לפרומפט המשתמש
     user_prompt = f"""history: {history}
 
@@ -205,30 +173,28 @@ current prompt: {prompt}
     
     try:
         if stream:
-            # החזר אובייקט סטרימינג שניתן לאיטרציה
-            response_stream = openai_client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": graph_system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
+            # החזר אובייקט סטרימינג שניתן לאיטרציה - API החדש
+            response_stream = anthropic_client.messages.create(
+                model="claude-3-sonnet-20240229",
+                max_tokens=2000,
                 temperature=0.05,  # הוספת טמפרטורה נמוכה לתשובות יותר ממוקדות
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_prompt}],
                 stream=True
             )
             return response_stream
         else:
-            # החזרת תשובה מלאה (ללא סטרימינג)
-            response = openai_client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": graph_system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                temperature=0.05  # הוספת טמפרטורה נמוכה לתשובות יותר ממוקדות
+            # החזרת תשובה מלאה (ללא סטרימינג) - API החדש
+            response = anthropic_client.messages.create(
+                model="claude-3-sonnet-20240229",
+                system=system_prompt,
+                max_tokens=2000,
+                temperature=0.05,  # הוספת טמפרטורה נמוכה לתשובות יותר ממוקדות
+                messages=[{"role": "user", "content": user_prompt}]
             )
-            return response.choices[0].message.content
+            return response.content[0].text
     except Exception as e:
-        return f"אירעה שגיאה בעת התקשורת עם OpenAI: {str(e)}"
+        return f"אירעה שגיאה בעת התקשורת עם Claude: {str(e)}"
 
 # Streamed response generator for chatbot
 def response_generator(prompt, df, graph_data,school_info):
@@ -237,16 +203,16 @@ def response_generator(prompt, df, graph_data,school_info):
     
     # קבלת התשובה באמצעות ה-API Key מקובץ .env והעברת נתוני הגרפים
     # עם סטרימינג מופעל
-    response_stream = get_openai_response(prompt, system_prompt, st.session_state.messages, graph_data, stream=True)
+    response_stream = get_anthropic_response(prompt, system_prompt, st.session_state.messages, graph_data, stream=True)
     
     full_response = ""
-    # לולאה על אירועי הסטרים מ-OpenAI
+    # לולאה על אירועי הסטרים מ-Claude
     for chunk in response_stream:
-        if chunk.choices and hasattr(chunk.choices[0], "delta") and hasattr(chunk.choices[0].delta, "content"):
-            content = chunk.choices[0].delta.content
-            if content:
-                full_response += content
-                yield content  # שליחת כל חלק שמתקבל מידית לתצוגה
+        # בדיקה אם החלק מכיל טקסט חדש לפי API החדש
+        if hasattr(chunk.delta, "text") and chunk.delta.text:
+            content = chunk.delta.text
+            full_response += content
+            yield content  # שליחת כל חלק שמתקבל מידית לתצוגה
     
     # החזרת התשובה המלאה לצורך שמירה בהיסטוריה
     return full_response
@@ -396,18 +362,19 @@ def main():
     # Chatbot section with API key information
     st.markdown("### צ'אטבוט לניתוח נתונים 🤖")
     
-    short=llm_gpt.return_llm_answer(return_highlighted_text(school_info),"","")
     # Show API status
     if api_key:
-        st.success(short)
+        st.success("חיבור ל-Claude API פעיל")
     else:
-        st.warning("לא נמצא API key של OpenAI. הצ'אטבוט עשוי לא לפעול כראוי.")
+        st.warning("לא נמצא API key של Claude. הצ'אטבוט עשוי לא לפעול כראוי.")
     
     st.markdown("שאל שאלות על הנתונים המוצגים בגרפים או על התוצאות הכלליות")
     
     # הצעות לשאלות למשתמש
     suggested_questions = [
         "הכן דוח מנהל",
+        "מהן חוזקות בית הספר שלי?",
+        "מהן החולשות של בית הספר שלי ?"
     ]
     
     # ממשק משתמש שמראה הצעות לשאלות
@@ -429,7 +396,7 @@ def main():
                 system_prompt = return_prompt(school_info) #llm_system_massage_manager.get_first_system_prompt(data)
                 
                 # שימוש בסטרימינג עבור שאלות דוגמה
-                response_stream = get_openai_response(
+                response_stream = get_anthropic_response(
                     question, 
                     system_prompt, 
                     st.session_state.messages[:-1], 
@@ -441,14 +408,14 @@ def main():
                 message_placeholder = st.empty()
                 full_response = ""
                 
-                # לולאה על אירועי הסטרים מ-OpenAI והצגתם בזמן אמת
+                # לולאה על אירועי הסטרים מ-Claude והצגתם בזמן אמת
                 for chunk in response_stream:
-                    if chunk.choices and hasattr(chunk.choices[0], "delta") and hasattr(chunk.choices[0].delta, "content"):
-                        content = chunk.choices[0].delta.content
-                        if content:
-                            full_response += content
-                            # מציג את התשובה המתעדכנת עם סמן מהבהב
-                            message_placeholder.markdown(full_response + "▌")
+                    # בדיקה אם החלק מכיל טקסט חדש לפי API החדש
+                    if hasattr(chunk.delta, "text") and chunk.delta.text:
+                        content = chunk.delta.text
+                        full_response += content
+                        # מציג את התשובה המתעדכנת עם סמן מהבהב
+                        message_placeholder.markdown(full_response + "▌")
                 
                 # הצגת התשובה המלאה הסופית (ללא הסמן)
                 message_placeholder.markdown(full_response)
@@ -482,7 +449,7 @@ def main():
             full_response = ""
             
             # קבלת תשובה מהצ'אטבוט עם סטרימינג
-            response_stream = get_openai_response(
+            response_stream = get_anthropic_response(
                 prompt, 
                 llm_system_massage_manager.get_first_system_prompt(filtered_df.to_markdown() if not filtered_df.empty else "אין נתונים זמינים"), 
                 st.session_state.messages[:-1], 
@@ -492,12 +459,11 @@ def main():
             
             # לולאה על אירועי הסטרים והצגת התשובה בזמן אמת
             for chunk in response_stream:
-                if chunk.choices and hasattr(chunk.choices[0], "delta") and hasattr(chunk.choices[0].delta, "content"):
-                    content = chunk.choices[0].delta.content
-                    if content:
-                        full_response += content
-                        # מציג את התשובה המתעדכנת עם סמן מהבהב
-                        message_placeholder.markdown(full_response + "▌")
+                if hasattr(chunk.delta, "text") and chunk.delta.text:
+                    content = chunk.delta.text
+                    full_response += content
+                    # מציג את התשובה המתעדכנת עם סמן מהבהב
+                    message_placeholder.markdown(full_response + "▌")
             
             # הצגת התשובה המלאה הסופית (ללא הסמן)
             message_placeholder.markdown(full_response)
