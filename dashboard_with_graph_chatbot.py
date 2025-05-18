@@ -60,6 +60,20 @@ st.markdown(
         padding: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         margin-bottom: 1rem;
+        margin-top: 1rem; /* מרווח מלמעלה למניעת חפיפה עם הכותרות */
+    }
+    
+    /* כותרות גרפים */
+    .graph-title {
+        margin-bottom: 15px; /* מרווח בין הכותרת לגרף */
+        padding-top: 10px; /* מרווח בין הכותרת לגרף */
+    }
+    
+    /* Fix headers position to prevent overlap */
+    h3 {
+        margin-bottom: 0.8rem !important;
+        padding-top: 0.5rem !important;
+        line-height: 1.6 !important;
     }
     
     /* Chat container styling */
@@ -98,6 +112,11 @@ st.markdown(
         flex: 1;
     }
     
+    /* Fix container heights to prevent overlap */
+    [data-testid="stVerticalBlock"] {
+        gap: 1rem !important;
+    }
+    
     /* Sidebar styling לקלאס הקודם */
     .css-1d391kg {
         text-align: right;
@@ -133,6 +152,81 @@ st.markdown(
     .element-container .stMarkdown ol {
         direction: rtl;
         text-align: right;
+    }
+    
+    /* התאמה למובייל - Media Queries */
+    @media (max-width: 768px) {
+        /* הקטנת כותרות במובייל */
+        h1 {
+            font-size: 1.8rem !important;
+        }
+        h2, h3 {
+            font-size: 1.4rem !important;
+            margin-bottom: 1rem !important;
+            padding-top: 0.8rem !important;
+        }
+        
+        /* צמצום מרווחים במובייל */
+        .main .block-container {
+            padding: 1rem 0.5rem !important;
+        }
+        
+        /* התאמת הגרפים למובייל */
+        .stPlotlyChart {
+            padding: 5px;
+            margin-bottom: 0.5rem;
+            margin-top: 1.2rem; /* יותר מרווח במובייל */
+        }
+        
+        /* שינוי פריסה במובייל - גרפים בטור ולא בשורה */
+        @media (max-width: 640px) {
+            [data-testid="column"] {
+                min-width: 100% !important;
+                width: 100% !important;
+                margin-bottom: 1rem;
+            }
+        }
+        
+        /* התאמת הסיידבר למובייל - רוחב מוקטן */
+        [data-testid="stSidebar"] {
+            min-width: 160px !important;
+            max-width: 160px !important;
+            width: 160px !important;
+        }
+        
+        /* התאמת גודל כפתורים וטקסט במובייל */
+        button {
+            font-size: 0.8rem !important;
+            padding: 0.3rem !important;
+        }
+        
+        /* התאמת תיבת צ'אט למובייל */
+        .chat-container {
+            padding: 10px;
+        }
+        
+        /* מרווחים בין המיכלים במובייל */
+        [data-testid="stVerticalBlock"] {
+            gap: 1.5rem !important;
+        }
+    }
+
+    /* התאמות נוספות למסכים קטנים מאוד */
+    @media (max-width: 480px) {
+        /* גרפים עוד יותר קומפקטיים */
+        .stPlotlyChart > div {
+            height: 250px !important;
+        }
+        
+        /* הקטנה נוספת של הכותרות */
+        h1 {
+            font-size: 1.5rem !important;
+        }
+        h2, h3 {
+            font-size: 1.2rem !important;
+            margin-bottom: 1.2rem !important;
+            padding-top: 1rem !important;
+        }
     }
     </style>
     """,
@@ -256,11 +350,25 @@ def main():
     st.title("דאשבורד ניתוח נתונים 📊")
     st.markdown("### ניתוח נתונים חינוכיים עם גרפים ואינטראקציה")
     
+    # הוספת גילוי מובייל
+    is_mobile = False
+    # לבדוק את רוחב המסך עם JavaScript (יודגם בצד הלקוח)
+    st.markdown(
+        """
+        <script>
+            if (window.innerWidth < 768) {
+                document.documentElement.style.setProperty('--mobile-view', 'true');
+            }
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
+    
     # Load data
     try:
         df = init()
     except Exception as e:
-        st.error(f"אירעה שגיאה בטעינת הנתונים: {e}")
+        st.error(f"Aירעה שגיאה בטעינת הנתונים: {e}")
         df = pd.DataFrame()  # Empty dataframe as fallback
     
     # Sidebar for filtering
@@ -279,17 +387,30 @@ def main():
             filtered_df = df
             st.warning("לא נמצאו נתונים לסינון")
     
-    # Create layout - 2 rows
-    # First row: 3 graphs
-    # Second row: chatbot
-    row1_col1, row1_col2, row1_col3 = st.columns(3)
+    # בדיקה מובייל - אם רוחב המסך קטן מ-768px, נציג את הגרפים אחד מתחת לשני
+    # החלפת הפונקציה המיושנת לפונקציה החדשה
+    screen_width = st.query_params.get("width", ["1200"])[0]
+    is_mobile = int(screen_width) < 768
+    
+    if is_mobile:
+        # במובייל - כל גרף בקולונה נפרדת אחד מתחת לשני
+        row1_col1 = st.container()
+        row1_col2 = st.container()
+        row1_col3 = st.container()
+    else:
+        # בדסקטופ - שלושה גרפים בשורה
+        row1_col1, row1_col2, row1_col3 = st.columns(3)
     
     # Generate sample graphs if no data
     if filtered_df.empty:
         # Sample data for demonstration
         with row1_col1:
-            st.markdown(" מדד חוסן")
+            # שינוי שיטת הצגת הכותרת למניעת חפיפה
+            st.markdown('<div class="graph-title"><h3>מדד חוסן</h3></div>', unsafe_allow_html=True)
+            height = 250 if is_mobile else 300
             fig1 = generate_sample_gauge()
+            # עדכון גובה הגרף ומרחק מהכותרת
+            fig1.update_layout(height=height, margin=dict(t=30, b=10))
             st.plotly_chart(fig1, use_container_width=True)
             
             # שמירת נתוני גרף לדוגמה לצ'אטבוט
@@ -300,8 +421,12 @@ def main():
             }
             
         with row1_col2:
-            st.markdown("### מיקוד שליטה פנימי")
+            # שינוי שיטת הצגת הכותרת למניעת חפיפה
+            st.markdown('<div class="graph-title"><h3>מיקוד שליטה פנימי</h3></div>', unsafe_allow_html=True)
+            height = 250 if is_mobile else 300
             fig2 = generate_sample_gauge(value=3.4, title="מיקוד שליטה פנימי")
+            # עדכון גובה הגרף ומרחק מהכותרת
+            fig2.update_layout(height=height, margin=dict(t=30, b=10))
             st.plotly_chart(fig2, use_container_width=True)
             
             # שמירת נתוני גרף לדוגמה לצ'אטבוט
@@ -312,8 +437,12 @@ def main():
             }
             
         with row1_col3:
-            st.markdown("### נתוני ציר הזמן")
+            # שינוי שיטת הצגת הכותרת למניעת חפיפה
+            st.markdown('<div class="graph-title"><h3>נתוני ציר הזמן</h3></div>', unsafe_allow_html=True)
+            height = 250 if is_mobile else 300
             fig3 = generate_sample_spider()
+            # עדכון גובה הגרף ומרחק מהכותרת
+            fig3.update_layout(height=height, margin=dict(t=30, b=10))
             st.plotly_chart(fig3, use_container_width=True)
             
             # שמירת נתוני גרף לדוגמה לצ'אטבוט
@@ -330,8 +459,13 @@ def main():
             school_info = SchoolInfo(filtered_df)
             
             with row1_col1:
-                st.markdown("### מדד חוסן")
+                # שינוי שיטת הצגת הכותרת למניעת חפיפה
+                st.markdown('<div class="graph-title"><h3>מדד חוסן</h3></div>', unsafe_allow_html=True)
+                # התאמת גובה הגרף למסך מובייל
+                height = 250 if is_mobile else 300
                 fig_risc = school_info.get_fig_risc("חוסן")
+                # עדכון גובה הגרף ומרחק מהכותרת
+                fig_risc.update_layout(height=height, margin=dict(t=30, b=10))
                 st.plotly_chart(fig_risc, use_container_width=True)
                 
                 # שמירת נתוני גרף אמיתיים לצ'אטבוט
@@ -342,8 +476,13 @@ def main():
                 }
                 
             with row1_col2:
-                st.markdown("### מיקוד שליטה פנימי")
+                # שינוי שיטת הצגת הכותרת למניעת חפיפה
+                st.markdown('<div class="graph-title"><h3>מיקוד שליטה פנימי</h3></div>', unsafe_allow_html=True)
+                # התאמת גובה הגרף למסך מובייל
+                height = 250 if is_mobile else 300
                 fig_ici = school_info.get_fig_ici("מיקוד שליטה")
+                # עדכון גובה הגרף ומרחק מהכותרת
+                fig_ici.update_layout(height=height, margin=dict(t=30, b=10))
                 st.plotly_chart(fig_ici, use_container_width=True)
                 
                 # שמירת נתוני גרף אמיתיים לצ'אטבוט
@@ -354,8 +493,13 @@ def main():
                 }
                 
             with row1_col3:
-                st.markdown("### התפלגות לפי ממדי זמן")
+                # שינוי שיטת הצגת הכותרת למניעת חפיפה
+                st.markdown('<div class="graph-title"><h3>התפלגות לפי ממדי זמן</h3></div>', unsafe_allow_html=True)
+                # התאמת גובה הגרף למסך מובייל
+                height = 250 if is_mobile else 300
                 fig_spider = school_info.get_fig_spider()
+                # עדכון גובה הגרף ומרחק מהכותרת
+                fig_spider.update_layout(height=height, margin=dict(t=30, b=10))
                 st.plotly_chart(fig_spider, use_container_width=True)
                 
                 # שמירת נתוני גרף אמיתיים לצ'אטבוט
@@ -412,9 +556,12 @@ def main():
     
     # ממשק משתמש שמראה הצעות לשאלות
     st.markdown("#### שאלות לדוגמה:")
-    cols = st.columns(3)
+    
+    # התאמת כמות העמודות בהתאם לרוחב המסך
+    col_count = 1 if is_mobile else 3
+    cols = st.columns(col_count)
     for i, question in enumerate(suggested_questions):
-        col_idx = i % 3
+        col_idx = i % col_count
         if cols[col_idx].button(question, key=f"question_{i}"):
             # Add user message to chat history
             st.session_state.messages.append({"role": "user", "content": question})
