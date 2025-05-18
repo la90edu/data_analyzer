@@ -474,13 +474,15 @@ def main():
             st.warning("לא נמצאו נתונים לסינון")
     
     # בדיקה מובייל - אם רוחב המסך קטן מ-768px, נציג את הגרפים אחד מתחת לשני
-    # החלפת הפונקציה המיושנת לפונקציה החדשה
-    try:
-        screen_width = st.query_params.get("width", ["1200"])[0]
-        is_mobile = int(screen_width) < 768
-    except:
-        # פתרון במקרה של שגיאה בפרמטרים
-        is_mobile = False
+    # Initialize mobile detection in session state if not already set
+    if "is_mobile" not in st.session_state:
+        st.session_state.is_mobile = False
+        
+    # Option 1: Allow manual toggle for mobile view in sidebar
+    with st.sidebar:
+        st.session_state.is_mobile = st.checkbox("תצוגת מובייל", value=st.session_state.is_mobile)
+    
+    is_mobile = True #st.session_state.is_mobile
     
     if is_mobile:
         # במובייל - כל גרף בקולונה נפרדת אחד מתחת לשני
