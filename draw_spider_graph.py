@@ -45,6 +45,7 @@ def draw_spider_graph(name, current_averages, global_averages, research_averager
         line=dict(color='#F37321')  # צבע ייחודי למקרא
     ))
 
+    # הגדרות מעודכנות לתאימות טובה יותר למובייל
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
@@ -52,9 +53,42 @@ def draw_spider_graph(name, current_averages, global_averages, research_averager
                 range=[1, 5]
             )
         ),
-        showlegend=True  # ✅ הצגת המקרא
+        showlegend=True,  # הצגת המקרא
+        legend=dict(
+            orientation="h",  # מקרא אופקי במקום אנכי
+            yanchor="bottom",
+            y=-0.15,  # הזזת המקרא מתחת לגרף
+            xanchor="center",
+            x=0.5
+        ),
+        margin=dict(l=10, r=10, t=30, b=80),  # שוליים מוקטנים
+        height=550,  # גובה מוגדל לגרף
+        autosize=True,  # תמיכה בשינוי גודל אוטומטי
     )
 
+    return fig
+
+# מוסיף פונקציית גרסה מוקטנת יותר לתצוגה במובייל
+def draw_spider_graph_mobile(name, current_averages, global_averages, research_averagers):
+    """גרסה מותאמת למובייל של גרף העכביש עם גודל ופרופורציות מותאמות למסכים קטנים"""
+    
+    fig = draw_spider_graph(name, current_averages, global_averages, research_averagers)
+    
+    # התאמות ספציפיות למובייל
+    fig.update_layout(
+        height=480,  # גובה מוגדל
+        margin=dict(l=5, r=5, t=20, b=70),  # שוליים מותאמים לגרף גבוה יותר
+        legend=dict(
+            font=dict(size=10),  # טקסט מקרא קטן יותר
+            y=-0.12,  # מיקום מעודכן של המקרא
+        ),
+        polar=dict(
+            angularaxis=dict(
+                tickfont=dict(size=9)  # גופן מעט גדול יותר לצירים
+            )
+        ),
+    )
+    
     return fig
 
 # categories = ['processing cost','mechanical properties','chemical stability',

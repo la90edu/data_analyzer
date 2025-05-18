@@ -89,9 +89,13 @@ class SchoolInfo:
       fig=graph.get_fig()
       return fig
   
-  def get_fig_spider(self):
+  def get_fig_spider(self, mobile=False):
       graph=Spider_Graph_type("spider",self.return_anigmas_result_as_dict())
-      fig=graph.get_fig()
+      if mobile:
+          # קריאה לפונקציה המותאמת למובייל
+          fig=graph.get_fig_mobile()
+      else:
+          fig=graph.get_fig()
       return fig
   
   def get_precentage_diffrent_from_global_anigmas(self,anigma_name):

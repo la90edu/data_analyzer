@@ -37,6 +37,11 @@ class Spider_Graph_type:
         fig= draw_spider_graph.draw_spider_graph(self.name, self.school_info_current, self.school_info_global, self.school_info_research)    
         return fig
         
+    def get_fig_mobile(self):
+        # קריאה לפונקציה המותאמת למובייל עם אותם פרמטרים
+        fig = draw_spider_graph.draw_spider_graph_mobile(self.name, self.school_info_current, self.school_info_global, self.school_info_research)
+        return fig
+        
         
 class Bar_Chart_Graph_type:
     def __init__(self,name,anigma_type,*args):

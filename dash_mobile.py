@@ -242,7 +242,7 @@ def response_generator(prompt, df, graph_data,school_info):
 # פונקציה לקבלת הסבר על גרף ספציפי
 def get_graph_explanation(graph_type, graph_data, school_info=None):
     """
-    מקבלת הסבר על גרף ספציפי ממודל השפה
+    מקבלת הסבר על גרף ספציפי ממודל השפה בסטרימינג
     
     Args:
         graph_type: סוג הגרף (risc, ici, spider)
@@ -290,48 +290,55 @@ def get_graph_explanation(graph_type, graph_data, school_info=None):
     if school_info and hasattr(school_info, 'school_name'):
         prompt += f"\nהנתונים מתייחסים לבית הספר: {school_info.school_name}"
     
+    system_prompt = """אתה יועץ חינוכי מומחה בניתוח נתונים פסיכולוגיים של תלמידים. 
+    עליך להסביר את משמעות הנתונים בצורה ברורה, מקצועית ומעשית.
+    
+    מדד החוסן (RISC) - מודד את יכולת התלמידים להתמודד עם אתגרים ומצבי לחץ. ערכים גבוהים מעידים על חוסן גבוה.
+    
+    מיקוד שליטה פנימי (ICI) - מודד את האמונה של התלמידים ביכולתם לשלוט בחייהם. ערכים גבוהים מעידים על תחושת שליטה עצמית חזקה יותר.
+    
+    תפיסות זמן (גרף עכביש) - מציג חמישה ממדים:
+    1. עבר שלילי - תפיסה שלילית של העבר, טראומות וחוויות קשות
+    2. עבר חיובי - תפיסה חיובית של העבר, נוסטלגיה וזכרונות טובים
+    3. הווה דטרמיניסטי - תפיסה פטליסטית של ההווה, חוסר שליטה
+    4. הווה הדוניסטי - תפיסת הווה הדוניסטית, חיפוש הנאות מיידיות
+    5. עתיד - יכולת תכנון קדימה, דחיית סיפוקים, הצבת מטרות
+    
+    התייחס בהסבר שלך להשלכות החינוכיות והמעשיות של הנתונים.
+    """
+    
     try:
-        system_prompt = """אתה יועץ חינוכי מומחה בניתוח נתונים פסיכולוגיים של תלמידים. 
-        עליך להסביר את משמעות הנתונים בצורה ברורה, מקצועית ומעשית.
-        
-        מדד החוסן (RISC) - מודד את יכולת התלמידים להתמודד עם אתגרים ומצבי לחץ. ערכים גבוהים מעידים על חוסן גבוה.
-        
-        מיקוד שליטה פנימי (ICI) - מודד את האמונה של התלמידים ביכולתם לשלוט בחייהם. ערכים גבוהים מעידים על תחושת שליטה עצמית.
-        
-        תפיסות זמן (גרף עכביש) - מציג חמישה ממדים:
-        1. עבר שלילי - תפיסה שלילית של העבר, טראומות וחוויות קשות
-        2. עבר חיובי - תפיסה חיובית של העבר, נוסטלגיה וזכרונות טובים
-        3. הווה דטרמיניסטי - תפיסה פטליסטית של ההווה, חוסר שליטה
-        4. הווה הדוניסטי - תפיסת הווה הדוניסטית, חיפוש הנאות מיידיות
-        5. עתיד - יכולת תכנון קדימה, דחיית סיפוקים, הצבת מטרות
-        
-        התייחס בהסבר שלך להשלכות החינוכיות והמעשיות של הנתונים.
-        """
-        
-        # השתמש ב-OpenAI API לקבלת הסבר
-        response = openai_client.chat.completions.create(
+        # ניסיון לקבל תשובה עם סטרימינג
+        response_stream = openai_client.chat.completions.create(
             model="gpt-4o",  # או מודל אחר שתרצה להשתמש בו
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.5,
-            max_tokens=1000
+            max_tokens=1000,
+            stream=True
         )
         
-        explanation = response.choices[0].message.content
+        # יצירת מקום להצגת ההסברים בזמן אמת
+        explanation_placeholder = st.empty()
+        full_explanation = ""
         
-        # אם התשובה ריקה או קצרה מדי, החזר הסבר כללי יותר
-        if not explanation or len(explanation) < 20:
-            if graph_type == "risc":
-                return "חוסן מתייחס ליכולת של תלמידים להתמודד עם אתגרים ומצבי לחץ. ככל שהציון גבוה יותר, כך התלמידים מראים יכולת טובה יותר להתמודדות עם קשיים."
-            elif graph_type == "ici":
-                return "מיקוד שליטה פנימי (ICI) מתייחס למידה שבה אדם מאמין שהוא שולט בחייו. ציון גבוה מעיד על תחושת שליטה עצמית גבוהה, בעוד ציון נמוך מעיד על תפיסה שגורמים חיצוניים שולטים בחייו."
-            elif graph_type == "spider":
-                return "גרף העכביש מציג חמישה ממדים של תפיסת זמן: עבר שלילי, עבר חיובי, הווה דטרמיניסטי, הווה הדוניסטי, ועתיד. האיזון בין ממדים אלו משפיע על קבלת החלטות ותפיסת העולם של התלמידים."
+        # לולאה על חלקי התשובה בסטרימינג והצגה בזמן אמת
+        for chunk in response_stream:
+            if chunk.choices and hasattr(chunk.choices[0], "delta") and hasattr(chunk.choices[0].delta, "content"):
+                content = chunk.choices[0].delta.content
+                if content:
+                    full_explanation += content
+                    # הצגת התשובה המתעדכנת עם סמן מהבהב
+                    explanation_placeholder.markdown(full_explanation + "▌")
         
-        return explanation
-    
+        # הצגה סופית של ההסבר המלא (ללא סמן)
+        explanation_placeholder.markdown(full_explanation)
+        
+        # החזרת ההסבר המלא
+        return full_explanation
+        
     except Exception as e:
         # במקרה של שגיאה, החזר הסבר כללי והודעת שגיאה
         error_msg = f"לא הצלחנו לייצר הסבר אוטומטי. שגיאה: {str(e)}"
@@ -615,7 +622,7 @@ def main():
                 
             with row1_col3:
                 st.markdown("### התפלגות לפי ממדי זמן")
-                fig_spider = school_info.get_fig_spider()
+                fig_spider = school_info.get_fig_spider(mobile=True)
                 st.plotly_chart(fig_spider, use_container_width=True)
                 
                 # שמירת נתוני גרף אמיתיים לצ'אטבוט

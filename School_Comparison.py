@@ -1,6 +1,4 @@
-"""
-# ניתוח על פי בית ספר
-# """
+
 
 import streamlit as st
 import pandas as pd
@@ -11,6 +9,8 @@ import consts
 from class_school_info import SchoolInfo
 import plotly
 import init
+
+# st.set_page_config(page_title="ניתוח על פי בית ספר")
 
 df=init.init()
 st.title('ניתוח ציר מנטלי ')
