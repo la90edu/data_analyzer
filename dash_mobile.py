@@ -47,6 +47,23 @@ st.markdown(
         direction: rtl;
     }
     
+    /* Sidebar open by default */
+    [data-testid="stSidebar"][aria-expanded="true"] {
+        width: 300px !important;
+    }
+    
+    [data-testid="stSidebar"][aria-expanded="false"] {
+        width: 300px !important;
+        margin-left: -300px;
+    }
+    
+    /* Force sidebar to be open on page load */
+    section[data-testid="stSidebar"] {
+        display: block !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    
     /* Dashboard Layout Styling */
     .main .block-container {
         padding-top: 2rem;
@@ -60,20 +77,6 @@ st.markdown(
         padding: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         margin-bottom: 1rem;
-        margin-top: 1rem; /* מרווח מלמעלה למניעת חפיפה עם הכותרות */
-    }
-    
-    /* כותרות גרפים */
-    .graph-title {
-        margin-bottom: 15px; /* מרווח בין הכותרת לגרף */
-        padding-top: 10px; /* מרווח בין הכותרת לגרף */
-    }
-    
-    /* Fix headers position to prevent overlap */
-    h3 {
-        margin-bottom: 0.8rem !important;
-        padding-top: 0.5rem !important;
-        line-height: 1.6 !important;
     }
     
     /* Chat container styling */
@@ -83,47 +86,6 @@ st.markdown(
         padding: 15px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         height: 100%;
-    }
-    
-    /* Sidebar styling - כללי */
-    [data-testid="stSidebar"] {
-        direction: rtl;
-        text-align: right;
-        background-color: #f8f9fa;
-        border-right: 1px solid #eaeaea;
-    }
-    
-    /* הגדרות סיידבר דסקטופ */
-    @media (min-width: 769px) {
-        [data-testid="stSidebar"] {
-            min-width: 200px !important;
-            max-width: 200px !important;
-            width: 200px !important;
-        }
-    }
-    
-    /* הגדרות סיידבר למובייל */
-    @media (max-width: 768px) {
-        [data-testid="stSidebar"] {
-            min-width: 100% !important; /* רוחב מלא במצב מקופל */
-            max-width: 260px !important; /* רוחב מקסימלי כשהוא פתוח */
-            padding: 0 !important;
-        }
-        
-        [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
-            gap: 0.5rem !important;
-        }
-        
-        section[data-testid="stSidebar"] > div {
-            padding-top: 2rem !important;
-        }
-    }
-    
-    /* ביטול מרווחים מיותרים בסרגל הצד */
-    [data-testid="stSidebar"] > div:first-child {
-        padding-top: 1rem;
-        padding-right: 1rem;
-        padding-left: 1rem;
     }
     
     /* שיפור גודל העמודות למניעת דחיסה של הגרפים */
@@ -139,136 +101,18 @@ st.markdown(
         flex: 1;
     }
     
-    /* Fix container heights to prevent overlap */
-    [data-testid="stVerticalBlock"] {
-        gap: 1rem !important;
+    /* עיצוב רכיב בחירת בית ספר בחלק העליון */
+    .school-selector {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
     
-    /* Sidebar styling לקלאס הקודם */
-    .css-1d391kg {
-        text-align: right;
-        direction: rtl;
-    }
-    
-    /* Style sidebar widgets and buttons */
-    [data-testid="stSidebar"] .stButton > button {
-        width: 100%;
-        text-align: center;
-        display: inline-flex;
-        justify-content: center;
-    }
-    
-    /* Sidebar header styling */
-    [data-testid="stSidebar"] h1, 
-    [data-testid="stSidebar"] h2, 
-    [data-testid="stSidebar"] h3, 
-    [data-testid="stSidebar"] h4 {
-        color: #333;
-        margin-bottom: 1rem;
-    }
-    
-    /* Sidebar collapse button styling */
-    button[kind="header"] {
-        background-color: transparent !important;
-    }
-    
-    /* Selectbox RTL support */
-    div[data-testid="stSelectbox"] {
-        text-align: right;
-        direction: rtl;
-    }
-    
-    div[data-testid="stSelectbox"] > label > p {
-        text-align: right;
-        direction: rtl;
-    }
-    
-    /* Make sure markdown in chat messages appears correctly in RTL */
-    .element-container .stMarkdown {
-        direction: rtl;
-        text-align: right;
-    }
-    
-    /* Styling for markdown elements in chat */
-    .element-container .stMarkdown h1,
-    .element-container .stMarkdown h2,
-    .element-container .stMarkdown h3,
-    .element-container .stMarkdown h4,
-    .element-container .stMarkdown h5,
-    .element-container .stMarkdown h6,
-    .element-container .stMarkdown p,
-    .element-container .stMarkdown ul,
-    .element-container .stMarkdown ol {
-        direction: rtl;
-        text-align: right;
-    }
-    
-    /* התאמה למובייל - Media Queries */
-    @media (max-width: 768px) {
-        /* הקטנת כותרות במובייל */
-        h1 {
-            font-size: 1.8rem !important;
-        }
-        h2, h3 {
-            font-size: 1.4rem !important;
-            margin-bottom: 1rem !important;
-            padding-top: 0.8rem !important;
-        }
-        
-        /* צמצום מרווחים במובייל */
-        .main .block-container {
-            padding: 1rem 0.5rem !important;
-        }
-        
-        /* התאמת הגרפים למובייל */
-        .stPlotlyChart {
-            padding: 5px;
-            margin-bottom: 0.5rem;
-            margin-top: 1.2rem; /* יותר מרווח במובייל */
-        }
-        
-        /* שינוי פריסה במובייל - גרפים בטור ולא בשורה */
-        @media (max-width: 640px) {
-            [data-testid="column"] {
-                min-width: 100% !important;
-                width: 100% !important;
-                margin-bottom: 1rem;
-            }
-        }
-        
-        /* התאמת גודל כפתורים וטקסט במובייל */
-        button {
-            font-size: 0.8rem !important;
-            padding: 0.3rem !important;
-        }
-        
-        /* התאמת תיבת צ'אט למובייל */
-        .chat-container {
-            padding: 10px;
-        }
-        
-        /* מרווחים בין המיכלים במובייל */
-        [data-testid="stVerticalBlock"] {
-            gap: 1.5rem !important;
-        }
-    }
-
-    /* התאמות נוספות למסכים קטנים מאוד */
-    @media (max-width: 480px) {
-        /* גרפים עוד יותר קומפקטיים */
-        .stPlotlyChart > div {
-            height: 250px !important;
-        }
-        
-        /* הקטנה נוספת של הכותרות */
-        h1 {
-            font-size: 1.5rem !important;
-        }
-        h2, h3 {
-            font-size: 1.2rem !important;
-            margin-bottom: 1.2rem !important;
-            padding-top: 1rem !important;
-        }
+    .school-selector .stSelectbox {
+        max-width: 400px;
+        margin: 0 auto;
     }
     </style>
     """,
@@ -295,6 +139,14 @@ if "graph_data" not in st.session_state:
         "ici": None, 
         "spider": None,
         "selected_school": None
+    }
+
+# Initialize session state for graph explanations
+if "graph_explanations" not in st.session_state:
+    st.session_state.graph_explanations = {
+        "risc": {"show": False, "explanation": ""},
+        "ici": {"show": False, "explanation": ""},
+        "spider": {"show": False, "explanation": ""}
     }
 
 # הפונקציה המשופרת לקבלת תשובה מ-OpenAI עם תמיכה בנתוני הגרפים ובסטרימינג
@@ -387,6 +239,114 @@ def response_generator(prompt, df, graph_data,school_info):
     # החזרת התשובה המלאה לצורך שמירה בהיסטוריה
     return full_response
 
+# פונקציה לקבלת הסבר על גרף ספציפי
+def get_graph_explanation(graph_type, graph_data, school_info=None):
+    """
+    מקבלת הסבר על גרף ספציפי ממודל השפה
+    
+    Args:
+        graph_type: סוג הגרף (risc, ici, spider)
+        graph_data: הנתונים של הגרף
+        school_info: אובייקט SchoolInfo אם קיים
+    
+    Returns:
+        הסבר טקסטואלי מפורט על הגרף ומשמעותו
+    """
+    if graph_type == "risc":
+        prompt = f"""
+        הסבר בבקשה את נתוני גרף החוסן הבאים:
+        ערך נוכחי: {graph_data['value']:.2f}
+        ממוצע ארצי: {graph_data['global_avg']:.2f}
+        
+        מה המשמעות של הנתונים האלה? האם הערך גבוה או נמוך ביחס לממוצע? מה זה אומר על בית הספר?
+        התייחס להשלכות החינוכיות והחברתיות של התוצאות. תן המלצות להמשך בהתבסס על הנתונים.
+        """
+    elif graph_type == "ici":
+        prompt = f"""
+        הסבר בבקשה את נתוני גרף מיקוד שליטה פנימי (ICI) הבאים:
+        ערך נוכחי: {graph_data['value']:.2f}
+        ממוצע ארצי: {graph_data['global_avg']:.2f}
+        
+        מה המשמעות של הנתונים האלה? האם הערך גבוה או נמוך ביחס לממוצע? מה זה אומר על בית הספר?
+        התייחס להשלכות החינוכיות והחברתיות של התוצאות. תן המלצות להמשך בהתבסס על הנתונים.
+        """
+    elif graph_type == "spider":
+        prompt = """
+        הסבר בבקשה את נתוני גרף תפיסות הזמן (גרף העכביש) המוצג.
+        מהי המשמעות של כל אחד מהממדים? אילו ממדים בולטים לטובה ואילו לרעה?
+        מהן ההשלכות החינוכיות והפסיכולוגיות של התוצאות?
+        תן המלצות להמשך בהתבסס על הנתונים.
+        """
+        
+        # הוספת פירוט על הקטגוריות בגרף העכביש אם יש נתונים
+        if graph_data:
+            prompt += "\n\nנתוני הקטגוריות השונות:\n"
+            for category, values in graph_data.items():
+                formatted_category = category.replace("future_", "").replace("_past", "").replace("_present", "")
+                if "current" in values and "global" in values:
+                    prompt += f"- {formatted_category}: ערך נוכחי {values['current']:.2f}, ממוצע ארצי {values['global']:.2f}\n"
+    
+    # הוספת מידע על בית הספר אם קיים
+    if school_info and hasattr(school_info, 'school_name'):
+        prompt += f"\nהנתונים מתייחסים לבית הספר: {school_info.school_name}"
+    
+    try:
+        system_prompt = """אתה יועץ חינוכי מומחה בניתוח נתונים פסיכולוגיים של תלמידים. 
+        עליך להסביר את משמעות הנתונים בצורה ברורה, מקצועית ומעשית.
+        
+        מדד החוסן (RISC) - מודד את יכולת התלמידים להתמודד עם אתגרים ומצבי לחץ. ערכים גבוהים מעידים על חוסן גבוה.
+        
+        מיקוד שליטה פנימי (ICI) - מודד את האמונה של התלמידים ביכולתם לשלוט בחייהם. ערכים גבוהים מעידים על תחושת שליטה עצמית.
+        
+        תפיסות זמן (גרף עכביש) - מציג חמישה ממדים:
+        1. עבר שלילי - תפיסה שלילית של העבר, טראומות וחוויות קשות
+        2. עבר חיובי - תפיסה חיובית של העבר, נוסטלגיה וזכרונות טובים
+        3. הווה דטרמיניסטי - תפיסה פטליסטית של ההווה, חוסר שליטה
+        4. הווה הדוניסטי - תפיסת הווה הדוניסטית, חיפוש הנאות מיידיות
+        5. עתיד - יכולת תכנון קדימה, דחיית סיפוקים, הצבת מטרות
+        
+        התייחס בהסבר שלך להשלכות החינוכיות והמעשיות של הנתונים.
+        """
+        
+        # השתמש ב-OpenAI API לקבלת הסבר
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",  # או מודל אחר שתרצה להשתמש בו
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.5,
+            max_tokens=1000
+        )
+        
+        explanation = response.choices[0].message.content
+        
+        # אם התשובה ריקה או קצרה מדי, החזר הסבר כללי יותר
+        if not explanation or len(explanation) < 20:
+            if graph_type == "risc":
+                return "חוסן מתייחס ליכולת של תלמידים להתמודד עם אתגרים ומצבי לחץ. ככל שהציון גבוה יותר, כך התלמידים מראים יכולת טובה יותר להתמודדות עם קשיים."
+            elif graph_type == "ici":
+                return "מיקוד שליטה פנימי (ICI) מתייחס למידה שבה אדם מאמין שהוא שולט בחייו. ציון גבוה מעיד על תחושת שליטה עצמית גבוהה, בעוד ציון נמוך מעיד על תפיסה שגורמים חיצוניים שולטים בחייו."
+            elif graph_type == "spider":
+                return "גרף העכביש מציג חמישה ממדים של תפיסת זמן: עבר שלילי, עבר חיובי, הווה דטרמיניסטי, הווה הדוניסטי, ועתיד. האיזון בין ממדים אלו משפיע על קבלת החלטות ותפיסת העולם של התלמידים."
+        
+        return explanation
+    
+    except Exception as e:
+        # במקרה של שגיאה, החזר הסבר כללי והודעת שגיאה
+        error_msg = f"לא הצלחנו לייצר הסבר אוטומטי. שגיאה: {str(e)}"
+        st.error(error_msg)
+        
+        # הסבר ברירת מחדל לפי סוג הגרף
+        if graph_type == "risc":
+            return "חוסן (RISC): מודד את היכולת של התלמידים להתמודד עם אתגרים ומצבי לחץ. ציון גבוה מעיד על יכולת התמודדות טובה יותר."
+        elif graph_type == "ici":
+            return "מיקוד שליטה פנימי (ICI): מודד את האמונה של אדם שהוא שולט בחייו ולא גורמים חיצוניים. ציון גבוה מעיד על תחושת מסוגלות עצמית חזקה יותר."
+        elif graph_type == "spider":
+            return "גרף תפיסות זמן: מציג את החלוקה של תפיסות הזמן השונות (עבר שלילי/חיובי, הווה דטרמיניסטי/הדוניסטי, עתיד). איזון נכון בין התפיסות חשוב להתנהגות בריאה והצלחה לימודית."
+        else:
+            return "לא הצלחנו לייצר הסבר אוטומטי לגרף זה."
+
 # Main Dashboard
 def main():
     st.title("דאשבורד ניתוח נתונים 📊")
@@ -450,37 +410,57 @@ def main():
     try:
         df = init()
     except Exception as e:
-        st.error(f"אירעה שגיאה בטעינת הנתונים: {e}")
+        st.error(f"Aאירעה שגיאה בטעינת הנתונים: {e}")
         df = pd.DataFrame()  # Empty dataframe as fallback
     
-    # Sidebar for filtering - עיצוב משופר
-    with st.sidebar:
-        st.markdown("<h3 style='margin-top:0;'>סינון נתונים</h3>", unsafe_allow_html=True)
-        
-        # School selection
-        selected_school = None
-        if not df.empty and 'school' in df.columns:
+    # בחירת בית ספר בחלק העליון של העמוד
+    selected_school = None
+    if not df.empty and 'school' in df.columns:
+        # מיכל עם עיצוב מותאם לבחירת בית הספר
+        school_selector_container = st.container()
+        with school_selector_container:
+            st.markdown('<div class="school-selector">', unsafe_allow_html=True)
+            st.markdown("<h3 style='text-align: center; margin-bottom: 15px;'>בחירת בית ספר</h3>", unsafe_allow_html=True)
             unique_schools = df["school"].unique().tolist()
-            selected_school = st.selectbox("בחר בית ספר:", unique_schools)
-            filtered_df = df[df['school'] == selected_school]
-            st.session_state.graph_data["selected_school"] = selected_school
+            selected_school = st.selectbox("בחר בית ספר:", unique_schools, key="school_selector_top")
+            st.markdown('</div>', unsafe_allow_html=True)
             
-            # הוספת מידע נוסף לסיידבר
-            if selected_school:
-                st.markdown(f"**בית ספר נבחר:** {selected_school}")
-        else:
-            # Demo data if no real data is available
-            filtered_df = df
-            st.warning("לא נמצאו נתונים לסינון")
+        filtered_df = df[df['school'] == selected_school]
+        st.session_state.graph_data["selected_school"] = selected_school
+    else:
+        # Demo data if no real data is available
+        filtered_df = df
+        st.warning("לא נמצאו נתונים לסינון")
+    
+    # הוספת CSS ספציפי למובייל אם נדרש
+    st.markdown(
+        """
+        <style>
+        @media (max-width: 768px) {
+            /* הסתרת הסיידבר במובייל */
+            [data-testid="stSidebar"] {
+                display: none;
+            }
+            
+            /* התאמת תוכן הדף למלוא רוחב המסך */
+            .main .block-container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     
     # בדיקה מובייל - אם רוחב המסך קטן מ-768px, נציג את הגרפים אחד מתחת לשני
     # Initialize mobile detection in session state if not already set
     if "is_mobile" not in st.session_state:
         st.session_state.is_mobile = False
         
-    # Option 1: Allow manual toggle for mobile view in sidebar
-    with st.sidebar:
-        st.session_state.is_mobile = st.checkbox("תצוגת מובייל", value=st.session_state.is_mobile)
+    # # Option 1: Allow manual toggle for mobile view in sidebar
+    # with st.sidebar:
+    #     st.session_state.is_mobile = st.checkbox("תצוגת מובייל", value=st.session_state.is_mobile)
     
     is_mobile = True #st.session_state.is_mobile
     
@@ -498,7 +478,7 @@ def main():
     if filtered_df.empty:
         # Sample data for demonstration
         with row1_col1:
-            st.markdown(" מדד חוסן")
+            st.markdown("### מדד חוסן")
             fig1 = generate_sample_gauge()
             st.plotly_chart(fig1, use_container_width=True)
             
@@ -508,6 +488,20 @@ def main():
                 "global_avg": 3.5,
                 "research_avg": 3.8
             }
+            
+            # כפתור "מה זה אומר?" עבור גרף החוסן
+            if st.button("מה זה אומר?", key="explain_risc"):
+                if not st.session_state.graph_explanations["risc"]["explanation"]:
+                    explanation = get_graph_explanation("risc", st.session_state.graph_data["risc"])
+                    st.session_state.graph_explanations["risc"]["explanation"] = explanation
+                
+                st.session_state.graph_explanations["risc"]["show"] = not st.session_state.graph_explanations["risc"]["show"]
+            
+            # הצגת ההסבר אם הכפתור נלחץ
+            if st.session_state.graph_explanations["risc"]["show"]:
+                st.markdown(f"""<div class="explanation-box">
+                {st.session_state.graph_explanations["risc"]["explanation"]}
+                </div>""", unsafe_allow_html=True)
             
         with row1_col2:
             st.markdown("### מיקוד שליטה פנימי")
@@ -520,6 +514,20 @@ def main():
                 "global_avg": 3.2,
                 "research_avg": 3.6
             }
+            
+            # כפתור "מה זה אומר?" עבור גרף מיקוד שליטה פנימי
+            if st.button("מה זה אומר?", key="explain_ici"):
+                if not st.session_state.graph_explanations["ici"]["explanation"]:
+                    explanation = get_graph_explanation("ici", st.session_state.graph_data["ici"])
+                    st.session_state.graph_explanations["ici"]["explanation"] = explanation
+                
+                st.session_state.graph_explanations["ici"]["show"] = not st.session_state.graph_explanations["ici"]["show"]
+            
+            # הצגת ההסבר אם הכפתור נלחץ
+            if st.session_state.graph_explanations["ici"]["show"]:
+                st.markdown(f"""<div class="explanation-box">
+                {st.session_state.graph_explanations["ici"]["explanation"]}
+                </div>""", unsafe_allow_html=True)
             
         with row1_col3:
             st.markdown("### נתוני ציר הזמן")
@@ -534,6 +542,20 @@ def main():
                 "hedonistic_present": {"current": 3.5, "global": 3.2, "research": 3.0},
                 "future": {"current": 3.9, "global": 3.7, "research": 4.0},
             }
+            
+            # כפתור "מה זה אומר?" עבור גרף תפיסות זמן
+            if st.button("מה זה אומר?", key="explain_spider"):
+                if not st.session_state.graph_explanations["spider"]["explanation"]:
+                    explanation = get_graph_explanation("spider", st.session_state.graph_data["spider"])
+                    st.session_state.graph_explanations["spider"]["explanation"] = explanation
+                
+                st.session_state.graph_explanations["spider"]["show"] = not st.session_state.graph_explanations["spider"]["show"]
+            
+            # הצגת ההסבר אם הכפתור נלחץ
+            if st.session_state.graph_explanations["spider"]["show"]:
+                st.markdown(f"""<div class="explanation-box">
+                {st.session_state.graph_explanations["spider"]["explanation"]}
+                </div>""", unsafe_allow_html=True)
     else:
         # Real graphs from data
         try:
@@ -551,6 +573,20 @@ def main():
                     "research_avg": st.session_state.research_average["risc"]
                 }
                 
+                # כפתור "מה זה אומר?" עבור גרף החוסן האמיתי
+                if st.button("מה זה אומר?", key="explain_risc_real"):
+                    if not st.session_state.graph_explanations["risc"]["explanation"]:
+                        explanation = get_graph_explanation("risc", st.session_state.graph_data["risc"], school_info)
+                        st.session_state.graph_explanations["risc"]["explanation"] = explanation
+                    
+                    st.session_state.graph_explanations["risc"]["show"] = not st.session_state.graph_explanations["risc"]["show"]
+                
+                # הצגת ההסבר אם הכפתור נלחץ
+                if st.session_state.graph_explanations["risc"]["show"]:
+                    st.markdown(f"""<div class="explanation-box">
+                    {st.session_state.graph_explanations["risc"]["explanation"]}
+                    </div>""", unsafe_allow_html=True)
+                
             with row1_col2:
                 st.markdown("### מיקוד שליטה פנימי")
                 fig_ici = school_info.get_fig_ici("מיקוד שליטה")
@@ -562,6 +598,20 @@ def main():
                     "global_avg": st.session_state.global_average["ici"],
                     "research_avg": st.session_state.research_average["ici"]
                 }
+                
+                # כפתור "מה זה אומר?" עבור גרף מיקוד שליטה אמיתי
+                if st.button("מה זה אומר?", key="explain_ici_real"):
+                    if not st.session_state.graph_explanations["ici"]["explanation"]:
+                        explanation = get_graph_explanation("ici", st.session_state.graph_data["ici"], school_info)
+                        st.session_state.graph_explanations["ici"]["explanation"] = explanation
+                    
+                    st.session_state.graph_explanations["ici"]["show"] = not st.session_state.graph_explanations["ici"]["show"]
+                
+                # הצגת ההסבר אם הכפתור נלחץ
+                if st.session_state.graph_explanations["ici"]["show"]:
+                    st.markdown(f"""<div class="explanation-box">
+                    {st.session_state.graph_explanations["ici"]["explanation"]}
+                    </div>""", unsafe_allow_html=True)
                 
             with row1_col3:
                 st.markdown("### התפלגות לפי ממדי זמן")
@@ -597,10 +647,24 @@ def main():
                         "research": st.session_state.research_average["future_future"]
                     }
                 }
+                
+                # כפתור "מה זה אומר?" עבור גרף תפיסות זמן אמיתי
+                if st.button("מה זה אומר?", key="explain_spider_real"):
+                    if not st.session_state.graph_explanations["spider"]["explanation"]:
+                        explanation = get_graph_explanation("spider", st.session_state.graph_data["spider"], school_info)
+                        st.session_state.graph_explanations["spider"]["explanation"] = explanation
+                    
+                    st.session_state.graph_explanations["spider"]["show"] = not st.session_state.graph_explanations["spider"]["show"]
+                
+                # הצגת ההסבר אם הכפתור נלחץ
+                if st.session_state.graph_explanations["spider"]["show"]:
+                    st.markdown(f"""<div class="explanation-box">
+                    {st.session_state.graph_explanations["spider"]["explanation"]}
+                    </div>""", unsafe_allow_html=True)
         except Exception as e:
             st.error(f"שגיאה בעת יצירת הגרפים: {e}")
     
-    # Divider
+    # Divider - הועבר למקום הזה שהוא מתחת לכל הגרפים והכפתורים
     st.markdown("---")
     
     # Chatbot section with API key information
