@@ -1,6 +1,7 @@
 from openai import OpenAI
 client = OpenAI()
 import pandas
+import llms
 
 system_prompt_ex="""
 ### 📝 **Provide a Comprehensive Feedback Based on Zimbardo Time Perspective Test Results**
@@ -30,28 +31,9 @@ you should provide an answer in Hebrew.
 """
 
 def return_llm_answer(user_prompt):
-    #system_prompt = system_prompt
-    #user_prompt=user_prompt
- 
+    return llms.get_openai_response(user_prompt, system_prompt_ex, [], {}, stream=False)
 
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content":  system_prompt},
-            {"role":"user","content":user_prompt}
-        ]
-    )
-    return response.choices[0].message.content
-
-def return_llm_answer(prompt,system,history):#user_prompt_pandas_table):
-    user_prompt=f"history:{history} + current promt:{prompt}"#prompt#user_prompt_pandas_table.to_markdown()
-    system_prompt=system
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": [{"type": "text", "text": system_prompt}]},
-            {"role": "user", "content": [{"type": "text", "text": user_prompt}]}
-        ]
-    )
-    return response.choices[0].message.content
+def return_llm_answer(prompt, system, history):
+    user_prompt = f"history:{history} + current promt:{prompt}"
+    return llms.get_openai_response(user_prompt, system, [], {}, stream=False)
 
