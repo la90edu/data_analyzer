@@ -93,6 +93,77 @@ else:
 
 st.markdown('</div>', unsafe_allow_html=True)
 
+# הצגת סיכום מצב בית הספר בתחילת הדף
+if selected_school and not filtered_df.empty:
+    # יצירת אובייקט SchoolInfo לחישוב הנתונים
+    school_info_summary = SchoolInfo(filtered_df)
+    
+    # חישוב הנתונים הרלוונטיים
+    risc_value = school_info_summary.risc
+    ici_value = school_info_summary.ici
+    
+    # בדיקה אם יש ערכים ממוצעים
+    if hasattr(st.session_state, 'global_average'):
+        risc_avg = st.session_state.global_average["risc"]
+        ici_avg = st.session_state.global_average["ici"]
+          # קביעת מצב בית הספר ביחס לממוצע הארצי
+        risc_status = "מעל הממוצע הארצי" if risc_value > risc_avg else "מתחת לממוצע הארצי"
+        ici_status = "מעל הממוצע הארצי" if ici_value > ici_avg else "מתחת לממוצע הארצי"
+        
+        # קבלת המדד החלש ביותר
+        worst_measure = school_info_summary.worst_anigma_name
+        worst_statement = school_info_summary.worst_heg1_text
+        
+        # קבלת נתוני ממדי הזמן
+        anigmas_dict = school_info_summary.return_anigmas_result_as_dict()
+        
+        # ניתוח תפיסות הזמן הבולטות ביותר (החיוביות והשליליות)
+        time_perspectives = {
+            "עבר שלילי": {"value": anigmas_dict.get("future_negetive_past", 0), "avg": st.session_state.global_average.get("future_negetive_past", 0)},
+            "עבר חיובי": {"value": anigmas_dict.get("future_positive_past", 0), "avg": st.session_state.global_average.get("future_positive_past", 0)},
+            "הווה דטרמיניסטי": {"value": anigmas_dict.get("future_fatalic_present", 0), "avg": st.session_state.global_average.get("future_fatalic_present", 0)},
+            "הווה הדוניסטי": {"value": anigmas_dict.get("future_hedonistic_present", 0), "avg": st.session_state.global_average.get("future_hedonistic_present", 0)},
+            "עתיד": {"value": anigmas_dict.get("future_future", 0), "avg": st.session_state.global_average.get("future_future", 0)}
+        }
+        
+        # מציאת תפיסת הזמן הגבוהה ביותר והנמוכה ביותר ביחס לממוצע
+        strongest_perspective = max(time_perspectives.items(), key=lambda x: (x[1]["value"] - x[1]["avg"]) if x[1]["avg"] != 0 else 0)
+        weakest_perspective = min(time_perspectives.items(), key=lambda x: (x[1]["value"] - x[1]["avg"]) if x[1]["avg"] != 0 else 0)
+        
+        # ניסוח הודעה על ממדי הזמן
+        strongest_status = "גבוה במיוחד" if strongest_perspective[1]["value"] > strongest_perspective[1]["avg"] else "נמוך במיוחד"
+        weakest_status = "נמוך במיוחד" if weakest_perspective[1]["value"] < weakest_perspective[1]["avg"] else "גבוה במיוחד"
+        
+        # יצירת הסיכום בתיבה מודגשת
+        st.markdown("""
+        <div style="background-color: #f0f7ff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 20px 0; direction: rtl; text-align: right;">
+            <h3 style="color: #1e3a8a; margin-bottom: 15px;">סיכום מצב בית הספר - למנהל</h3>
+            <p><strong>מדד החוסן</strong> של בית הספר נמצא <strong style="color: {0};">{1}</strong>.</p>
+            <p><strong>מיקוד השליטה הפנימי</strong> של התלמידים נמצא <strong style="color: {2};">{3}</strong>.</p>
+            <p><strong>ממדי הזמן:</strong></p>
+            <ul>
+                <li>ממד <strong>{6}</strong> נמצא <strong style="color: {7};">{8}</strong> ביחס לממוצע הארצי.</li>
+                <li>ממד <strong>{9}</strong> נמצא <strong style="color: {10};">{11}</strong> ביחס לממוצע הארצי.</li>
+            </ul>
+            <p>תחום הדורש תשומת לב מיוחדת: <strong style="color: #d32f2f;">{4}</strong></p>
+            <p>היגד בעייתי במיוחד: "{5}"</p>
+            <p style="font-style: italic; margin-top: 15px;">* המידע מבוסס על סקרים שהועברו לתלמידים. לחץ על הכפתורים מטה לניתוח מעמיק וקבלת המלצות מפורטות.</p>
+        </div>
+        """.format(
+            "#2e7d32" if risc_status == "מעל הממוצע הארצי" else "#d32f2f",
+            risc_status,
+            "#2e7d32" if ici_status == "מעל הממוצע הארצי" else "#d32f2f",
+            ici_status,
+            worst_measure,
+            worst_statement,
+            strongest_perspective[0],  # שם הממד החזק ביותר
+            "#2e7d32" if strongest_perspective[1]["value"] > strongest_perspective[1]["avg"] else "#d32f2f",  # צבע לממד החזק
+            strongest_status,  # סטטוס הממד החזק
+            weakest_perspective[0],  # שם הממד החלש ביותר
+            "#d32f2f" if weakest_perspective[1]["value"] < weakest_perspective[1]["avg"] else "#2e7d32",  # צבע לממד החלש
+            weakest_status  # סטטוס הממד החלש
+        ), unsafe_allow_html=True)
+
 
 # יצירת משתני מצב אם לא קיימים
 if "graph_data" not in st.session_state:
@@ -183,8 +254,7 @@ if selected_school and not filtered_df.empty:
             if st.session_state.show_explanations["combined"] and not st.session_state.explanations["combined"]:
                 combined_placeholder = st.empty()
                 combined_placeholder.markdown("מייצר ניתוח מקיף...")
-                
-                # יצירת פרומפט מסכם לכל הגרפים
+                  # יצירת פרומפט מסכם לכל הגרפים
                 summary_prompt = f"""
                 נתח את הנתונים הבאים של בית הספר {selected_school} ותן הסבר כולל על המשמעות שלהם:
                 
@@ -196,12 +266,31 @@ if selected_school and not filtered_df.empty:
                    ערך נוכחי: {st.session_state.graph_data.get('ici', {}).get('value', 'חסר')}
                    ממוצע ארצי: {st.session_state.graph_data.get('ici', {}).get('global_avg', 'חסר')}
                 
-                3. תפיסות זמן: [נתוני תפיסות הזמן השונות]
+                3. תפיסות זמן:
+                   א. עבר שלילי: 
+                      ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_negetive_past', {}).get('current', 'חסר')}
+                      ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_negetive_past', {}).get('global', 'חסר')}
+                   
+                   ב. עבר חיובי: 
+                      ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_positive_past', {}).get('current', 'חסר')}
+                      ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_positive_past', {}).get('global', 'חסר')}
+                   
+                   ג. הווה דטרמיניסטי: 
+                      ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_fatalic_present', {}).get('current', 'חסר')}
+                      ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_fatalic_present', {}).get('global', 'חסר')}
+                   
+                   ד. הווה הדוניסטי: 
+                      ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_hedonistic_present', {}).get('current', 'חסר')}
+                      ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_hedonistic_present', {}).get('global', 'חסר')}
+                   
+                   ה. עתיד: 
+                      ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_future', {}).get('current', 'חסר')}
+                      ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_future', {}).get('global', 'חסר')}
                 
-                התייחס למשמעות המשולבת של כל המדדים והקשר ביניהם. תן שאלות מנחות למנהל בית הספר שיעזרו לו לשפר את המצב.
+                התייחס למשמעות המשולבת של כל המדדים והקשר ביניהם. תן ניתוח מעמיק של תפיסות הזמן והשפעתן על המדדים האחרים. תן שאלות מנחות למנהל בית הספר שיעזרו לו לשפר את המצב.
                 """
                 
-                # מערכת פרומפט לניתוח מסכם
+                # מערכת פרומפט לניתוח מסכם           
                 system_prompt = """אתה יועץ חינוכי מומחה בניתוח נתונים פסיכולוגיים של תלמידים. 
                 הסבר בבקשה את המשמעות המשולבת של כל המדדים הבאים עבור בית הספר והקשר ביניהם.
                 
@@ -210,11 +299,15 @@ if selected_school and not filtered_df.empty:
                 מיקוד שליטה פנימי (ICI) - מודד את האמונה של התלמידים ביכולתם לשלוט בחייהם. ערכים גבוהים מעידים על תחושת שליטה עצמית חזקה יותר.
                 
                 תפיסות זמן - חמישה ממדים:
-                1. עבר שלילי - תפיסה שלילית של העבר, טראומות וחוויות קשות
-                2. עבר חיובי - תפיסה חיובית של העבר, נוסטלגיה וזכרונות טובים
-                3. הווה דטרמיניסטי - תפיסה פטליסטית של ההווה, חוסר שליטה
-                4. הווה הדוניסטי - תפיסת הווה הדוניסטית, חיפוש הנאות מיידיות
-                5. עתיד - יכולת תכנון קדימה, דחיית סיפוקים, הצבת מטרות
+                1. עבר שלילי - תפיסה שלילית של העבר, טראומות וחוויות קשות. ערך גבוה מעיד על נטייה להתמקד בחוויות שליליות מהעבר.
+                2. עבר חיובי - תפיסה חיובית של העבר, נוסטלגיה וזכרונות טובים. ערך גבוה מעיד על תחושת ביטחון ושורשיות.
+                3. הווה דטרמיניסטי - תפיסה פטליסטית של ההווה, אמונה שהכל נקבע מראש וחוסר שליטה. ערך גבוה מעיד על תחושת חוסר אונים.
+                4. הווה הדוניסטי - תפיסת הווה הדוניסטית, חיפוש הנאות מיידיות וחוסר תכנון. ערך גבוה מעיד על התמקדות בסיפוקים מיידיים.
+                5. עתיד - יכולת תכנון קדימה, דחיית סיפוקים, הצבת מטרות. ערך גבוה מעיד על אוריינטציה לעתיד ויכולת תכנון.
+                
+                חשוב לציין שאיזון בין הממדים חשוב מאוד להצלחה. לדוגמה, אוריינטציית עתיד גבוהה מקושרת עם הישגים אקדמיים, בעוד שעבר שלילי גבוה מקושר עם דיכאון וחרדה. 
+                
+                בניתוח שלך, התייחס למשמעות של אחוזים גבוהים ונמוכים בכל מדד ולהשפעה ההדדית ביניהם. התייחס גם לאיזון בין המדדים השונים.
                 
                 סיים את ההסבר בשאלות מנחות למנהל בית הספר שיכולות לעודד אותו לחשוב על שיפור המצב שלו.
                 לדוגמה: 'איך כיום בית הספר מעודד תלמידים להרגיש בעלות על המעשים שלהם?', 'האם יש מקומות נוספים שהיית משלב יכולת לקחת בעלות על הצלחות או כשלונות ומידת ההשפעה האישית של התלמיד עליהן?'
