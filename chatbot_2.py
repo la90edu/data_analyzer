@@ -1,21 +1,23 @@
 import streamlit as st
-import random
 import time
-import llm_gpt
+import llms
 import pandas as pd
 import llm_system_massage_manager
 
-# if st.session_state.df_for_chatbot is None:
-#     st.session_state.df_for_chatbot=""
-
-# Streamed response emulator
-def response_generator(prompt,df):
+def response_generator(prompt, df):
     data = df.to_markdown()
-    response = llm_gpt.return_llm_answer(prompt,llm_system_massage_manager.get_first_system_prompt(data),st.session_state.messages)
-    for word in response.split():
-        yield word + " "
-        time.sleep(0.05)
-
+    system_prompt = llm_system_massage_manager.get_first_system_prompt(data)
+    response_stream = llms.get_openai_response(prompt, system_prompt, st.session_state.messages, {}, stream=True)
+    
+    full_response = ""
+    for chunk in response_stream:
+        if chunk.choices and hasattr(chunk.choices[0], "delta") and hasattr(chunk.choices[0].delta, "content"):
+            content = chunk.choices[0].delta.content
+            if content:
+                yield content + " "
+                time.sleep(0.05)
+                full_response += content
+    return full_response
 
 def add_chat(data):
     st.title("Simple chat")
@@ -39,7 +41,7 @@ def add_chat(data):
 
         # Display assistant response in chat message container
         with st.chat_message("assistant"):
-            response = st.write_stream(response_generator(prompt,data))
+            response = st.write_stream(response_generator(prompt, data))
         # Add assistant response to chat history
         st.session_state.messages.append({"role": "assistant", "content": response})
     
