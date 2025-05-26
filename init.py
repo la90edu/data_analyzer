@@ -6,7 +6,15 @@ import texts
 
 
 def init():
-    st.set_page_config(layout="wide")
+    st.set_page_config(
+        layout="wide",
+        page_title="דאשבורד ניתוח נתונים",
+        page_icon="📊",
+        initial_sidebar_state="expanded",
+        menu_items={
+            'About': "אפליקציה לניתוח נתונים פסיכולוגיים של תלמידים"
+        }
+    )
     st.markdown(
     """
     <style>

@@ -15,8 +15,8 @@ def draw_spider_graph(name, current_averages, global_averages, research_averager
     lst_global = dict_to_list(global_averages)
     lst_research = dict_to_list(research_averagers)
 
-    categories = ["תפיסת עבר מעכבת", "עבר כתשתית חיובית", "דטרמינסטיות",
-                  "סיפוק מיידי", "עתיד"]
+    categories = ["התמקדות בחוויות טראומתיות מהעבר", "התמקדות בזכרונות חיוביים מהעבר", "תחושה של חוסר שליטה על העתיד",
+                  "חיים והתמקדות בהווה ובהנאות של כאן ועכשיו גם במחיר ויתור על העתיד", "תכנון לטווח הארוך והסתכלות קדימה"]
 
     fig = go.Figure()
 

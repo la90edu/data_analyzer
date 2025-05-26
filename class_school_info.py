@@ -6,26 +6,71 @@ from graph_manager import Gauge_Graph_type, Spider_Graph_type
 import streamlit as st   
 import texts               
 
-class SchoolInfo:
-  def __init__(self,df):
+class SchoolInfo:  def __init__(self,df):
     self.df = df
-    self.ici=anigmas.ici_result(df)
-    self.risc=anigmas.risc_result(df)   
-    self.future_negetive_past=anigmas.future_negetive_past_result(df)
-    self.future_positive_past=anigmas.future_positive_past_result(df)
-    self.future_fatalic_present=anigmas.future_fatalic_present_result(df)
-    self.future_hedonistic_present=anigmas.future_hedonistic_present_result(df)
-    self.future_future=anigmas.future_future_result(df)
+    self.ici=self.round_number(anigmas.ici_result(df))
+    self.risc=self.round_number(anigmas.risc_result(df))
+    self.future_negetive_past=self.round_number(anigmas.future_negetive_past_result(df))
+    self.future_positive_past=self.round_number(anigmas.future_positive_past_result(df))
+    self.future_fatalic_present=self.round_number(anigmas.future_fatalic_present_result(df))
+    self.future_hedonistic_present=self.round_number(anigmas.future_hedonistic_present_result(df))
+    self.future_future=self.round_number(anigmas.future_future_result(df))
 
     self.worst_anigma=self.return_biggest_delata_from_global_positive_wrost_anigma()[0]
-    self.worst_anigma_value=self.return_biggest_delata_from_global_positive_wrost_anigma()[1]
+    self.worst_anigma_value=self.round_number(self.return_biggest_delata_from_global_positive_wrost_anigma()[1])
     self.worst_anigma_name=texts.return_translate_anigma_name(self,self.worst_anigma)
     self.best_anigma=self.return_biggest_delata_from_global_negetive_best_anigma()[0]
-    self.best_anigma_value=self.return_biggest_delata_from_global_negetive_best_anigma()[1]
+    self.best_anigma_value=self.round_number(self.return_biggest_delata_from_global_negetive_best_anigma()[1])
     self.best_anigma_name=texts.return_translate_anigma_name(self,self.best_anigma)
-    self.worst_heg1_text= self.return_first_and_second_worst_heg_according_to_wrost_anigma()[0]
     
+    # Get worst heg text and handle potential issues
+    worst_heg_result = self.return_first_and_second_worst_heg_according_to_wrost_anigma()
+    if worst_heg_result and len(worst_heg_result) >= 1:
+        self.worst_heg1_text = worst_heg_result[0]
+    else:
+        self.worst_heg1_text = "לא נמצא היגד בעייתי"
     
+    self.round_delta_as_dict=self.return_round_delta_from_global_as_dict()
+    self.ici_delta_present=self.return_text_from_round_delta("ici")
+    self.risc_delta_present=self.return_text_from_round_delta("risc")
+    self.future_negetive_past_delta_present=self.return_text_from_round_delta("future_negetive_past")
+    self.future_positive_past_delta_present=self.return_text_from_round_delta("future_positive_past")
+    self.future_fatalic_present_delta_present=self.return_text_from_round_delta("future_fatalic_present")
+    self.future_hedonistic_present_delta_present=self.return_text_from_round_delta("future_hedonistic_present")
+    self.future_future_delta_present=self.return_text_from_round_delta("future_future")
+      
+ 
+  def return_exact_precent_delta(self,anigma_name):
+      delta=self.round_delta_as_dict[anigma_name]
+      return delta*100
+
+
+  def return_text_from_round_delta(self,anigma_name):
+      delta=self.round_delta_as_dict[anigma_name]
+      
+      if delta>=3:
+            return -30
+      if delta<=-3:
+            return 30
+      
+      match delta:
+          case 0:
+              return 0
+          case -1:
+              return 10
+          case -2:
+              return 20
+          case 1:
+              return -10
+          case 2:
+                return  -20
+           
+             
+
+            
+    
+  def round_number(self,number):
+        return round(number,1)
   
   def return_anigmas_result_as_dict(self):
         result= {
@@ -50,6 +95,11 @@ class SchoolInfo:
             "future_future":self.get_precentage_diffrent_from_global_anigmas("future_future")
         }
         return result
+  
+  def return_round_delta_from_global_as_dict(self):
+        delta_dict=self.return_delta_from_global_as_dict()
+        rounded_delta_dict = {key: self.round_number(value) for key, value in delta_dict.items()}
+        return rounded_delta_dict
   
   def return_biggest_delata_from_global_positive_wrost_anigma(self): # when global is bigger than local
         delta_dict=self.return_delta_from_global_as_dict()

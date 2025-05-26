@@ -9,10 +9,24 @@ colors = {
     "research_color": "#5733FF"
 }
 
+def round_number(number):
+        return round(number,1)
+  
+# research_average={
+#     "ici":3.71,
+#     "risc":3.22,
+#     "future_negetive_past":2.47,
+#     "future_positive_past":3.2,
+#     "future_fatalic_present":2.7,
+#     "future_hedonistic_present":2.84,
+#     "future_future":3.68
+    
+# }
+
 research_average={
-    "ici":3.71,
-    "risc":3.22,
-    "future_negetive_past":2.47,
+    "ici":3.7,
+    "risc":3.2,
+    "future_negetive_past":2.4,
     "future_positive_past":3.2,
     "future_fatalic_present":2.7,
     "future_hedonistic_present":2.84,
@@ -26,13 +40,13 @@ def return_research_average():
 def init_st_session_global_average_and_research_average(global_df):
     # יצירת מילון global_average ישירות מהפונקציות של anigmas במקום שימוש ב-SchoolInfo
     global_average = {
-        "ici": float(anigmas.ici_result(global_df)),
-        "risc": float(anigmas.risc_result(global_df)),
-        "future_negetive_past": float(anigmas.future_negetive_past_result(global_df)),
-        "future_positive_past": float(anigmas.future_positive_past_result(global_df)),
-        "future_fatalic_present": float(anigmas.future_fatalic_present_result(global_df)),
-        "future_hedonistic_present": float(anigmas.future_hedonistic_present_result(global_df)),
-        "future_future": float(anigmas.future_future_result(global_df))
+        "ici": round_number(float(anigmas.ici_result(global_df))),
+        "risc": round_number(float(anigmas.risc_result(global_df))),
+        "future_negetive_past": round_number(float(anigmas.future_negetive_past_result(global_df))),
+        "future_positive_past": round_number(float(anigmas.future_positive_past_result(global_df))),
+        "future_fatalic_present": round_number(float(anigmas.future_fatalic_present_result(global_df))),
+        "future_hedonistic_present": round_number(float(anigmas.future_hedonistic_present_result(global_df))),
+        "future_future": round_number(float(anigmas.future_future_result(global_df)))
     }
     # אתחול המשתנים ב-session_state
     st.session_state.global_average = global_average

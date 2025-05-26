@@ -77,11 +77,18 @@ div[data-testid="stSelectbox"] {
 """, unsafe_allow_html=True)
 
 # כותרת הדף
-st.title("דאשבורד ניתוח נתונים 📊")
+# st.title("דאשבורד ניתוח נתונים 📊")
 
+# הוספת הסבר על הדאשבורד
+st.markdown("""
+<div class="explanation-box" style="margin-bottom: 30px;">
+    <h3>ברוכים הבאים לדאשבורד הנתונים</h3>
+    <p>מנהל/ת יקר/ה, לאחרונה השתתפו תלמידי בית הספר שלך בתכנית "הציר המנטלי" שמטרתה לבחון תפיסות עצמיות של תלמידים בהיבטים מרכזיים בחייהם - כמו היכולת להתמודד עם אתגרים, מניעים לקבלת ההחלטות שלהם לטווח הרחוק, גמישות שלהם לסביבה משתנה ותפיסתם לגבי השפעתם על העתיד שלהם. למטה מובואות כמה מסקנות מהנתונים לגבי בית הספר שלך.</p>
+</div>
+""", unsafe_allow_html=True)
 # אזור בחירת בית הספר בראש העמוד
 st.markdown('<div class="school-selector">', unsafe_allow_html=True)
-st.markdown("<h3 style='margin-bottom: 15px;'>בחר בית ספר לניתוח</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='margin-bottom: 15px;'>בחר/י בית ספר לניתוח</h3>", unsafe_allow_html=True)
 
 if not df.empty and 'school' in df.columns:
     unique_schools = df["school"].unique().tolist()
@@ -92,6 +99,10 @@ else:
     filtered_df = df
 
 st.markdown('</div>', unsafe_allow_html=True)
+
+
+
+
 
 # הצגת סיכום מצב בית הספר בתחילת הדף
 if selected_school and not filtered_df.empty:
@@ -119,11 +130,11 @@ if selected_school and not filtered_df.empty:
         
         # ניתוח תפיסות הזמן הבולטות ביותר (החיוביות והשליליות)
         time_perspectives = {
-            "עבר שלילי": {"value": anigmas_dict.get("future_negetive_past", 0), "avg": st.session_state.global_average.get("future_negetive_past", 0)},
-            "עבר חיובי": {"value": anigmas_dict.get("future_positive_past", 0), "avg": st.session_state.global_average.get("future_positive_past", 0)},
-            "הווה דטרמיניסטי": {"value": anigmas_dict.get("future_fatalic_present", 0), "avg": st.session_state.global_average.get("future_fatalic_present", 0)},
-            "הווה הדוניסטי": {"value": anigmas_dict.get("future_hedonistic_present", 0), "avg": st.session_state.global_average.get("future_hedonistic_present", 0)},
-            "עתיד": {"value": anigmas_dict.get("future_future", 0), "avg": st.session_state.global_average.get("future_future", 0)}
+            "התמקדמות בטראומת עבר": {"value": anigmas_dict.get("future_negetive_past", 0), "avg": st.session_state.global_average.get("future_negetive_past", 0)},
+            "התמקדמות בזיכרונות חיוביים": {"value": anigmas_dict.get("future_positive_past", 0), "avg": st.session_state.global_average.get("future_positive_past", 0)},
+            "תחושה של חוסר שליטה על העתיד": {"value": anigmas_dict.get("future_fatalic_present", 0), "avg": st.session_state.global_average.get("future_fatalic_present", 0)},
+            "חיים והתמקדות בהווה ובהנאות של כאן ועכשיו גם במחיר ויתור על העתידהווה" : {"value": anigmas_dict.get("future_hedonistic_present", 0), "avg": st.session_state.global_average.get("future_hedonistic_present", 0)},
+            "תכנון לטווח הארוך והסתכלות קדימה": {"value": anigmas_dict.get("future_future", 0), "avg": st.session_state.global_average.get("future_future", 0)}
         }
         
         # מציאת תפיסת הזמן הגבוהה ביותר והנמוכה ביותר ביחס לממוצע
@@ -138,15 +149,13 @@ if selected_school and not filtered_df.empty:
         st.markdown("""
         <div style="background-color: #f0f7ff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 20px 0; direction: rtl; text-align: right;">
             <h3 style="color: #1e3a8a; margin-bottom: 15px;">סיכום מצב בית הספר - למנהל</h3>
-            <p><strong>מדד החוסן</strong> של בית הספר נמצא <strong style="color: {0};">{1}</strong>.</p>
+            <p><strong>חוסן</strong> של בית הספר נמצא <strong style="color: {0};">{1}</strong>.</p>
             <p><strong>מיקוד השליטה הפנימי</strong> של התלמידים נמצא <strong style="color: {2};">{3}</strong>.</p>
-            <p><strong>ממדי הזמן:</strong></p>
             <ul>
-                <li>ממד <strong>{6}</strong> נמצא <strong style="color: {7};">{8}</strong> ביחס לממוצע הארצי.</li>
-                <li>ממד <strong>{9}</strong> נמצא <strong style="color: {10};">{11}</strong> ביחס לממוצע הארצי.</li>
+                <li><strong>{6}</strong> נמצא <strong style="color: {7};">{8}</strong> ביחס לממוצע הארצי.</li>
+                <li> <strong>{9}</strong> נמצא <strong style="color: {10};">{11}</strong> ביחס לממוצע הארצי.</li>
             </ul>
             <p>תחום הדורש תשומת לב מיוחדת: <strong style="color: #d32f2f;">{4}</strong></p>
-            <p>היגד בעייתי במיוחד: "{5}"</p>
             <p style="font-style: italic; margin-top: 15px;">* המידע מבוסס על סקרים שהועברו לתלמידים. לחץ על הכפתורים מטה לניתוח מעמיק וקבלת המלצות מפורטות.</p>
         </div>
         """.format(
@@ -267,23 +276,23 @@ if selected_school and not filtered_df.empty:
                    ממוצע ארצי: {st.session_state.graph_data.get('ici', {}).get('global_avg', 'חסר')}
                 
                 3. תפיסות זמן:
-                   א. עבר שלילי: 
+                   א. התמקדות בחוויות טראומתיות מהעבר 
                       ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_negetive_past', {}).get('current', 'חסר')}
                       ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_negetive_past', {}).get('global', 'חסר')}
                    
-                   ב. עבר חיובי: 
+                   ב. התמקדות בזכרונות חיוביים מהעבר: 
                       ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_positive_past', {}).get('current', 'חסר')}
                       ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_positive_past', {}).get('global', 'חסר')}
                    
-                   ג. הווה דטרמיניסטי: 
+                   ג.תחושה של חוסר שליטה על העתיד 
                       ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_fatalic_present', {}).get('current', 'חסר')}
                       ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_fatalic_present', {}).get('global', 'חסר')}
                    
-                   ד. הווה הדוניסטי: 
+                   ד.חיים והתמקדות בהווה ובהנאות של כאן ועכשיו גם במחיר ויתור על העתיד 
                       ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_hedonistic_present', {}).get('current', 'חסר')}
                       ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_hedonistic_present', {}).get('global', 'חסר')}
                    
-                   ה. עתיד: 
+                   ה. תכנון לטווח הארוך והסתכלות קדימה: 
                       ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_future', {}).get('current', 'חסר')}
                       ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_future', {}).get('global', 'חסר')}
                 
@@ -299,11 +308,11 @@ if selected_school and not filtered_df.empty:
                 מיקוד שליטה פנימי (ICI) - מודד את האמונה של התלמידים ביכולתם לשלוט בחייהם. ערכים גבוהים מעידים על תחושת שליטה עצמית חזקה יותר.
                 
                 תפיסות זמן - חמישה ממדים:
-                1. עבר שלילי - תפיסה שלילית של העבר, טראומות וחוויות קשות. ערך גבוה מעיד על נטייה להתמקד בחוויות שליליות מהעבר.
-                2. עבר חיובי - תפיסה חיובית של העבר, נוסטלגיה וזכרונות טובים. ערך גבוה מעיד על תחושת ביטחון ושורשיות.
-                3. הווה דטרמיניסטי - תפיסה פטליסטית של ההווה, אמונה שהכל נקבע מראש וחוסר שליטה. ערך גבוה מעיד על תחושת חוסר אונים.
-                4. הווה הדוניסטי - תפיסת הווה הדוניסטית, חיפוש הנאות מיידיות וחוסר תכנון. ערך גבוה מעיד על התמקדות בסיפוקים מיידיים.
-                5. עתיד - יכולת תכנון קדימה, דחיית סיפוקים, הצבת מטרות. ערך גבוה מעיד על אוריינטציה לעתיד ויכולת תכנון.
+                1. התמקדות בחוויות טראומתיות מהעבר- תפיסה שלילית של העבר, טראומות וחוויות קשות. ערך גבוה מעיד על נטייה להתמקד בחוויות שליליות מהעבר.
+                2.  התמקדות בזכרונות חיוביים מהעבר- תפיסה חיובית של העבר, נוסטלגיה וזכרונות טובים. ערך גבוה מעיד על תחושת ביטחון ושורשיות.
+                3. תחושה של חוסר שליטה על העתיד- תפיסה פטליסטית של ההווה, אמונה שהכל נקבע מראש וחוסר שליטה. ערך גבוה מעיד על תחושת חוסר אונים.
+                4. חיים והתמקדות בהווה ובהנאות של כאן ועכשיו גם במחיר ויתור על העתיד - תפיסת הווה הדוניסטית, חיפוש הנאות מיידיות וחוסר תכנון. ערך גבוה מעיד על התמקדות בסיפוקים מיידיים.
+                5. תכנון לטווח הארוך והסתכלות קדימה - יכולת תכנון קדימה, דחיית סיפוקים, הצבת מטרות. ערך גבוה מעיד על אוריינטציה לעתיד ויכולת תכנון.
                 
                 חשוב לציין שאיזון בין הממדים חשוב מאוד להצלחה. לדוגמה, אוריינטציית עתיד גבוהה מקושרת עם הישגים אקדמיים, בעוד שעבר שלילי גבוה מקושר עם דיכאון וחרדה. 
                 
@@ -542,68 +551,7 @@ if st.button("אני רוצה הסבר על המחקר", key="research_explanati
     # 
     # גת הגרפים בטורים
     # בדיקה אם יש לחיצה על כפתור הצגת גרפים או אם הגרפים כבר הוצגו קודם
-if st.button("הצג לי גרפים") or st.session_state.show_graphs_state:
-        # עדכון המצב לזכור שהגרפים הוצגו
-        st.session_state.show_graphs_state = True
-        
-        st.markdown("### מדד חוסן")
-        fig_risc = school_info.get_fig_risc("חוסן")
-        st.plotly_chart(fig_risc, use_container_width=True)
-        
-        # שמירת נתוני גרף חוסן למצב
-        st.session_state.graph_data["risc"] = {
-            "value": school_info.risc,
-            "global_avg": st.session_state.global_average["risc"],
-            "research_avg": st.session_state.research_average["risc"]
-        }
-        
-        
-        st.markdown("### מיקוד שליטה פנימי")
-        fig_ici = school_info.get_fig_ici("מיקוד שליטה")
-        st.plotly_chart(fig_ici, use_container_width=True)
-        
-        # שמירת נתוני גרף מיקוד שליטה למצב
-        st.session_state.graph_data["ici"] = {
-            "value": school_info.ici,
-            "global_avg": st.session_state.global_average["ici"],
-            "research_avg": st.session_state.research_average["ici"]
-        }
-        
-        
-        st.markdown("### התפלגות לפי ממדי זמן")
-        fig_spider = school_info.get_fig_spider()
-        st.plotly_chart(fig_spider, use_container_width=True)
-        
-        # שמירת נתוני גרף עכביש למצב
-        anigmas_dict = school_info.return_anigmas_result_as_dict()
-        st.session_state.graph_data["spider"] = {
-            "future_negetive_past": {
-                "current": anigmas_dict["future_negetive_past"],
-                "global": st.session_state.global_average["future_negetive_past"],
-                "research": st.session_state.research_average["future_negetive_past"]
-            },
-            "future_positive_past": {
-                "current": anigmas_dict["future_positive_past"],
-                "global": st.session_state.global_average["future_positive_past"],
-                "research": st.session_state.research_average["future_positive_past"]
-            },
-            "future_fatalic_present": {
-                "current": anigmas_dict["future_fatalic_present"],
-                "global": st.session_state.global_average["future_fatalic_present"],
-                "research": st.session_state.research_average["future_fatalic_present"]
-            },
-            "future_hedonistic_present": {
-                "current": anigmas_dict["future_hedonistic_present"],
-                "global": st.session_state.global_average["future_hedonistic_present"],
-                "research": st.session_state.research_average["future_hedonistic_present"]
-            },
-            "future_future": {
-                "current": anigmas_dict["future_future"],
-                "global": st.session_state.global_average["future_future"],
-                "research": st.session_state.research_average["future_future"]
-            }
-        }
-        
+
 # הוספת כפתור "הסבר לי עוד על המדדים"
 if st.button("הסבר לי עוד על המדדים"):
     st.session_state.show_explanations["metrics"] = True
@@ -690,3 +638,78 @@ if st.button("הסבר לי עוד על המדדים"):
         </div>
         """, unsafe_allow_html=True)
 
+if st.button("הצג לי גרפים") or st.session_state.show_graphs_state:
+        # עדכון המצב לזכור שהגרפים הוצגו
+        st.session_state.show_graphs_state = True
+        
+            # הוספת הסבר קצר לגרף חוסן
+        st.markdown("""
+        <div style="direction: rtl; text-align: right; margin-bottom: 30px;">
+            <p>"ניתן לראות כאן את המדדים שלך . בירוק אפשר לראות את הממוצע בבית הספר שלך, הקו הצהוב מציג את הממוצע על פי המחקר שנעשה ברובו בארה"ב ואילו הקו הכחול את הממוצע הארצי של כלל בתי הספר שלקחו חלק במחקר. ניתן ללמוד עוד על הנתונים בלחיצה על הכפתור של "הראה לי ניתוח מקיף.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # הצגת גרף חוסן        st.markdown("### מדד חוסן")
+        fig_risc = school_info.get_fig_risc("חוסן")
+        st.plotly_chart(fig_risc, use_container_width=True, key="risc_chart_1")
+
+    
+
+        # שמירת נתוני גרף חוסן למצב
+        st.session_state.graph_data["risc"] = {
+            "value": school_info.risc,
+            "global_avg": st.session_state.global_average["risc"],
+            "research_avg": st.session_state.research_average["risc"]
+        }        # הצגת גרף מיקוד שליטה
+        st.markdown("### מיקוד שליטה פנימי")
+        fig_ici = school_info.get_fig_ici("מיקוד שליטה")
+        st.plotly_chart(fig_ici, use_container_width=True, key="ici_chart_1")
+
+       # שמירת נתוני גרף מיקוד שליטה למצב
+        st.session_state.graph_data["ici"] = {
+            "value": school_info.ici,
+            "global_avg": st.session_state.global_average["ici"],
+            "research_avg": st.session_state.research_average["ici"]
+        }        # הצגת גרף עכביש
+        st.markdown("### התפלגות לפי ממדי זמן")
+             # הוספת הסבר קצר לגרף עכביש
+        st.markdown("""
+        <div style="direction: rtl; text-align: right; margin-bottom: 30px;">
+            <p>ניתן לראות כאן את פרופיל בית הספר ביחס לתפיסת הזמן כאשר כל אחד מהצירים מייצג את אחת מתפיסות הזמן.
+            "הגרף הירוק מציג את הממוצע בבית הספר שלך, הקו הצהוב מציג את הממוצע על פי המחקר שנעשה ברובו בארה"ב ואילו הקו הכחול את הממוצע הארצי של כלל בתי הספר שלקחו חלק במחקר. ניתן ללמוד עוד על הנתונים בלחיצה על הכפתור של "הראה לי ניתוח מקיף.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        fig_spider = school_info.get_fig_spider()
+        st.plotly_chart(fig_spider, use_container_width=True, key="spider_chart_1")
+
+   
+
+        # שמירת נתוני גרף עכביש למצב
+        anigmas_dict = school_info.return_anigmas_result_as_dict()
+        st.session_state.graph_data["spider"] = {
+            "future_negetive_past": {
+                "current": anigmas_dict["future_negetive_past"],
+                "global": st.session_state.global_average["future_negetive_past"],
+                "research": st.session_state.research_average["future_negetive_past"]
+            },
+            "future_positive_past": {
+                "current": anigmas_dict["future_positive_past"],
+                "global": st.session_state.global_average["future_positive_past"],
+                "research": st.session_state.research_average["future_positive_past"]
+            },
+            "future_fatalic_present": {
+                "current": anigmas_dict["future_fatalic_present"],
+                "global": st.session_state.global_average["future_fatalic_present"],
+                "research": st.session_state.research_average["future_fatalic_present"]
+            },
+            "future_hedonistic_present": {
+                "current": anigmas_dict["future_hedonistic_present"],
+                "global": st.session_state.global_average["future_hedonistic_present"],
+                "research": st.session_state.research_average["future_hedonistic_present"]
+            },
+            "future_future": {
+                "current": anigmas_dict["future_future"],
+                "global": st.session_state.global_average["future_future"],
+                "research": st.session_state.research_average["future_future"]
+            }
+        }
