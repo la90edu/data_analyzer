@@ -4,11 +4,11 @@ def return_translate_anigma_name(self,anigma_name):
         translate_anigma_name={
             "ici":"מיקוד שליטה פנימי",
             "risc":"חוסן",
-            "future_negetive_past":"תפיסת עבר מעכבת",
-            "future_positive_past":"עבר כתשתית חיובית",
-            "future_fatalic_present":"דטרמינסטיות",
-            "future_hedonistic_present":"סיפוק מיידי",
-            "future_future":"עתיד"
+            "future_negetive_past":"התמקדות בחוויות טראומתיות מהעבר",
+            "future_positive_past":"התמקדות בזכרונות חיוביים מהעבר",
+            "future_fatalic_present":"תחושה של חוסר שליטה על העתיד",
+            "future_hedonistic_present":"חיים והתמקדות בהווה ובהנאות של כאן ועכשיו גם במחיר ויתור על העתיד",
+            "future_future":"תכנון לטווח הארוך והסתכלות קדימה"
         }
         return translate_anigma_name[anigma_name]
 
