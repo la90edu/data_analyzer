@@ -39,27 +39,48 @@ class SchoolInfo:
       delta=self.round_delta_as_dict[anigma_name]
       return delta*100
 
-
   def return_int_from_round_delta(self,anigma_name):
       delta=self.round_delta_as_dict[anigma_name]
       
-      if delta>=3:
+      if delta>=0.3:
             return -30
-      if delta<=-3:
+      if delta<=-0.3:
             return 30
       
       match delta:
           case 0:
               return 0
-          case -1:
+          case -0.1:
               return 10
-          case -2:
+          case -0.2:
               return 20
-          case 1:
+          case 0.1:
               return -10
-          case 2:
+          case 0.2:
                 return  -20
            
+  def return_text_from_round_delta(self,anigma_name):
+      delta=self.round_delta_as_dict.get(anigma_name)
+      
+      if delta is None:
+          return "לא ניתן לקבוע (נתון חסר)"
+          
+      if delta>=0.3:
+            return "מעל הממוצע הארצי בצורה משמעותית מאוד (30%+)"
+      if delta<=-0.3:
+            return "מעל הממוצע הארצי בצורה משמעותית מאוד (30%+)"
+      
+      match delta:
+          case 0:
+              return "במידה שווה לממוצע הארצי"
+          case -0.1:
+              return "מעט מעל הממוצע הארצי (10%+)"
+          case -0.2:
+              return "(20%+) מעל הממוצע הארצי בצורה משמעותית"
+          case 0.1:
+              return "מתחתת לממוצע הארצי (10%-)"
+          case 0.2:
+                return  "מעט מתחת לממוצע הארצי (20%-)"
              
 
             

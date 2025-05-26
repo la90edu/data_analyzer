@@ -101,7 +101,119 @@ else:
 st.markdown('</div>', unsafe_allow_html=True)
 
 
+#יצירת סיכום שיסתמכך על התוצאות שמתקבלות מ SchoolInfo.return_text_from_round_delta(ici),school_info.return_text_from_round_delta(risc) ,school_info.return_text_from_round_delta(future_negetive_past),school_info.return_text_from_round_delta(future_positive_past),school_info.return_text_from_round_delta(future_fatalic_present),school_info.return_text_from_round_delta(future_hedonistic_present),school_info.return_text_from_round_delta(future_future)
 
+# הוספת כפתור ליצירת סיכום באמצעות מודל שפה
+if selected_school and not filtered_df.empty:
+    # יצירת אובייקט SchoolInfo לחישוב הנתונים (אם לא קיים כבר)
+    if 'school_info_summary' not in locals():
+        school_info_summary = SchoolInfo(filtered_df)
+    
+    # קבלת טקסט המתאר את מצב בית הספר בכל מדד ביחס לממוצע הארצי
+    ici_text = school_info_summary.return_text_from_round_delta("ici")
+    risc_text = school_info_summary.return_text_from_round_delta("risc")
+    future_negetive_past_text = school_info_summary.return_text_from_round_delta("future_negetive_past")
+    future_positive_past_text = school_info_summary.return_text_from_round_delta("future_positive_past")
+    future_fatalic_present_text = school_info_summary.return_text_from_round_delta("future_fatalic_present")
+    future_hedonistic_present_text = school_info_summary.return_text_from_round_delta("future_hedonistic_present")
+    future_future_text = school_info_summary.return_text_from_round_delta("future_future")
+    
+    # הצגת סיכום המדדים לפני כפתור הסיכום האוטומטי
+    st.markdown(f"""
+    <div style="background-color: #f5f9ff; padding: 15px; border-radius: 10px; margin: 10px 0; direction: rtl; text-align: right;">
+        <h4 style="color: #2c3e50; margin-bottom: 10px;">מצב בית הספר ביחס לממוצע הארצי:</h4>
+        <ul style="list-style-type: none; padding-right: 10px;">
+            <li>🧠 <strong>מיקוד שליטה פנימי (ICI):</strong> {ici_text}</li>
+            <li>💪 <strong>חוסן (RISC):</strong> {risc_text}</li>
+            <li>🕰️ <strong>תפיסות זמן:</strong>
+                <ul style="list-style-type: none; padding-right: 20px;">
+                    <li>• התמקדות בטראומות עבר: {future_negetive_past_text}</li>
+                    <li>• התמקדות בזיכרונות חיוביים: {future_positive_past_text}</li>
+                    <li>• תחושת חוסר שליטה בעתיד: {future_fatalic_present_text}</li>
+                    <li>• חיים בהווה: {future_hedonistic_present_text}</li>
+                    <li>• תכנון לטווח ארוך: {future_future_text}</li>
+                </ul>
+            </li>
+        </ul>
+    </div>    """, unsafe_allow_html=True)    # הוספת שאלות לחשיבה למנהל בהתבסס על נתוני בית הספר
+    # יצירת פרומפט לשאילת שאלות בהתבסס על המדדים
+    questions_prompt = f"""
+    בהתבסס על הנתונים הבאים של בית הספר {selected_school}:
+
+    1. מיקוד שליטה פנימי (ICI): {ici_text}
+    2. חוסן (RISC): {risc_text}
+    3. התמקדות בטראומות עבר: {future_negetive_past_text}
+    4. התמקדות בזיכרונות חיוביים: {future_positive_past_text}
+    5. תחושת חוסר שליטה בעתיד: {future_fatalic_present_text}
+    6. חיים בהווה: {future_hedonistic_present_text}
+    7. תכנון לטווח ארוך: {future_future_text}
+
+    יצר בדיוק 2 שאלות עמוקות וממוקדות שיעזרו למנהל/ת בית הספר לחשוב על דרכים לשפר את המדדים האלה.
+    השאלות צריכות להיות ממוקדות בתחומים הדורשים את השיפור הרב ביותר.
+    """
+
+    # מערכת פרומפט לשאלות חשיבה
+    system_prompt = """אתה יועץ חינוכי מומחה בניתוח נתונים פסיכולוגיים של תלמידים. 
+    נדרשות ממך 2 שאלות מדויקות וממוקדות שיעזרו למנהל/ת בית הספר לחשוב כיצד לשפר את התחומים בהם נדרש שיפור.
+
+    שאלות טובות הן כאלה ש:
+    1. גורמות למנהל/ת לחשוב על מבנים קיימים בבית הספר
+    2. מעוררות חשיבה על פעולות קונקרטיות שניתן לבצע
+    3. מתמקדות בתחומים בהם נדרש שיפור משמעותי
+    4. מחוברות לעולם המעשי של ניהול בית ספר
+
+    הצג בדיוק 2 שאלות. כל שאלה צריכה להיות קצרה (2-3 שורות לכל היותר), ממוקדת וברורה.
+    לא להוסיף שום טקסט מעבר לשאלות עצמן.
+    """
+
+    try:
+        # קריאה למודל השפה לקבלת 2 שאלות לחשיבה
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": questions_prompt}
+            ],
+            temperature=0.7,
+            max_tokens=500
+        )
+        
+        # קבלת השאלות מהתשובה
+        questions = response.choices[0].message.content.strip().split("\n")
+          # סינון שורות ריקות
+        questions = [q.strip() for q in questions if q.strip()]
+        
+        # הצגת השאלות בפורמט דומה לסיכום המדדים
+        st.markdown(f"""
+        <div style="background-color: #f5f9ff; padding: 15px; border-radius: 10px; margin: 10px 0; direction: rtl; text-align: right;">
+            <h4 style="color: #2c3e50; margin-bottom: 10px;">🤔 שאלות לחשיבה:</h4>
+            <ul style="list-style-type: none; padding-right: 10px;">
+                <li><strong>שאלה 1:</strong> {questions[0] if len(questions) > 0 else ""}</li>
+                <li><strong>שאלה 2:</strong> {questions[1] if len(questions) > 1 else ""}</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+    except Exception as e:
+        st.error(f"לא הצלחנו לייצר שאלות לחשיבה. שגיאה: {str(e)}")
+   
+    # כפתור ליצירת סיכום אוטומטי
+    # if st.button("צור סיכום אוטומטי למנהל"):
+    #     with st.spinner("מייצר סיכום..."):
+    #         try:
+    #             # קריאה לפונקציה ליצירת סיכום ב-LLM
+    #             llm_summary = llms.generate_principal_summary(school_info_summary)
+                
+    #             # הצגת הסיכום בתיבה מעוצבת
+    #             st.markdown("""
+    #             <div style="background-color: #e8f4f8; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 20px 0; direction: rtl; text-align: right;">
+    #                 <h3 style="color: #2c3e50; margin-bottom: 15px;">סיכום אוטומטי - מבט מנהל</h3>
+    #                 <div style="color: #34495e;">
+    #                     {0}
+    #                 </div>
+    #             </div>
+    #             """.format(llm_summary.replace("\n", "<br>")), unsafe_allow_html=True)
+    #         except Exception as e:
+    #             st.error(f"אירעה שגיאה בעת יצירת הסיכום: {str(e)}")
 
 
 # הצגת סיכום מצב בית הספר בתחילת הדף
@@ -110,11 +222,19 @@ if selected_school and not filtered_df.empty:
     school_info_summary = SchoolInfo(filtered_df)
     
     # חישוב הנתונים הרלוונטיים
-    risc_value = school_info_summary.risc
-    ici_value = school_info_summary.ici
-    
-    # בדיקה אם יש ערכים ממוצעים
+    ici_text = school_info_summary.return_text_from_round_delta("ici")
+    risc_text = school_info_summary.return_text_from_round_delta("risc")
+    future_negetive_past_text = school_info_summary.return_text_from_round_delta("future_negetive_past")
+    future_positive_past_text = school_info_summary.return_text_from_round_delta("future_positive_past")
+    future_fatalic_present_text = school_info_summary.return_text_from_round_delta("future_fatalic_present")
+    future_hedonistic_present_text = school_info_summary.return_text_from_round_delta("future_hedonistic_present")
+    future_future_text = school_info_summary.return_text_from_round_delta("future_future")
+      # בדיקה אם יש ערכים ממוצעים
     if hasattr(st.session_state, 'global_average'):
+        # קבלת ערכי חוסן ומיקוד שליטה
+        risc_value = school_info_summary.risc
+        ici_value = school_info_summary.ici
+        
         risc_avg = st.session_state.global_average["risc"]
         ici_avg = st.session_state.global_average["ici"]
           # קביעת מצב בית הספר ביחס לממוצע הארצי
@@ -130,8 +250,8 @@ if selected_school and not filtered_df.empty:
         
         # ניתוח תפיסות הזמן הבולטות ביותר (החיוביות והשליליות)
         time_perspectives = {
-            "התמקדמות בטראומת עבר": {"value": anigmas_dict.get("future_negetive_past", 0), "avg": st.session_state.global_average.get("future_negetive_past", 0)},
-            "התמקדמות בזיכרונות חיוביים": {"value": anigmas_dict.get("future_positive_past", 0), "avg": st.session_state.global_average.get("future_positive_past", 0)},
+            "התמקדנות בטראומת עבר": {"value": anigmas_dict.get("future_negetive_past", 0), "avg": st.session_state.global_average.get("future_negetive_past", 0)},
+            "התמקדנות בזיכרונות חיוביים": {"value": anigmas_dict.get("future_positive_past", 0), "avg": st.session_state.global_average.get("future_positive_past", 0)},
             "תחושה של חוסר שליטה על העתיד": {"value": anigmas_dict.get("future_fatalic_present", 0), "avg": st.session_state.global_average.get("future_fatalic_present", 0)},
             "חיים והתמקדות בהווה ובהנאות של כאן ועכשיו גם במחיר ויתור על העתידהווה" : {"value": anigmas_dict.get("future_hedonistic_present", 0), "avg": st.session_state.global_average.get("future_hedonistic_present", 0)},
             "תכנון לטווח הארוך והסתכלות קדימה": {"value": anigmas_dict.get("future_future", 0), "avg": st.session_state.global_average.get("future_future", 0)}
@@ -145,33 +265,33 @@ if selected_school and not filtered_df.empty:
         strongest_status = "גבוה במיוחד" if strongest_perspective[1]["value"] > strongest_perspective[1]["avg"] else "נמוך במיוחד"
         weakest_status = "נמוך במיוחד" if weakest_perspective[1]["value"] < weakest_perspective[1]["avg"] else "גבוה במיוחד"
         
-        # יצירת הסיכום בתיבה מודגשת
-        st.markdown("""
-        <div style="background-color: #f0f7ff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 20px 0; direction: rtl; text-align: right;">
-            <h3 style="color: #1e3a8a; margin-bottom: 15px;">סיכום מצב בית הספר - למנהל</h3>
-            <p><strong>חוסן</strong> של בית הספר נמצא <strong style="color: {0};">{1}</strong>.</p>
-            <p><strong>מיקוד השליטה הפנימי</strong> של התלמידים נמצא <strong style="color: {2};">{3}</strong>.</p>
-            <ul>
-                <li><strong>{6}</strong> נמצא <strong style="color: {7};">{8}</strong> ביחס לממוצע הארצי.</li>
-                <li> <strong>{9}</strong> נמצא <strong style="color: {10};">{11}</strong> ביחס לממוצע הארצי.</li>
-            </ul>
-            <p>תחום הדורש תשומת לב מיוחדת: <strong style="color: #d32f2f;">{4}</strong></p>
-            <p style="font-style: italic; margin-top: 15px;">* המידע מבוסס על סקרים שהועברו לתלמידים. לחץ על הכפתורים מטה לניתוח מעמיק וקבלת המלצות מפורטות.</p>
-        </div>
-        """.format(
-            "#2e7d32" if risc_status == "מעל הממוצע הארצי" else "#d32f2f",
-            risc_status,
-            "#2e7d32" if ici_status == "מעל הממוצע הארצי" else "#d32f2f",
-            ici_status,
-            worst_measure,
-            worst_statement,
-            strongest_perspective[0],  # שם הממד החזק ביותר
-            "#2e7d32" if strongest_perspective[1]["value"] > strongest_perspective[1]["avg"] else "#d32f2f",  # צבע לממד החזק
-            strongest_status,  # סטטוס הממד החזק
-            weakest_perspective[0],  # שם הממד החלש ביותר
-            "#d32f2f" if weakest_perspective[1]["value"] < weakest_perspective[1]["avg"] else "#2e7d32",  # צבע לממד החלש
-            weakest_status  # סטטוס הממד החלש
-        ), unsafe_allow_html=True)
+        # # יצירת הסיכום בתיבה מודגשת
+        # st.markdown("""
+        # <div style="background-color: #f0f7ff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 20px 0; direction: rtl; text-align: right;">
+        #     <h3 style="color: #1e3a8a; margin-bottom: 15px;">סיכום מצב בית הספר - למנהל</h3>
+        #     <p><strong>חוסן</strong> של בית הספר נמצא <strong style="color: {0};">{1}</strong>.</p>
+        #     <p><strong>מיקוד השליטה הפנימי</strong> של התלמידים נמצא <strong style="color: {2};">{3}</strong>.</p>
+        #     <ul>
+        #         <li><strong>{6}</strong> נמצא <strong style="color: {7};">{8}</strong> ביחס לממוצע הארצי.</li>
+        #         <li> <strong>{9}</strong> נמצא <strong style="color: {10};">{11}</strong> ביחס לממוצע הארצי.</li>
+        #     </ul>
+        #     <p>תחום הדורש תשומת לב מיוחדת: <strong style="color: #d32f2f;">{4}</strong></p>
+        #     <p style="font-style: italic; margin-top: 15px;">* המידע מבוסס על סקרים שהועברו לתלמידים. לחץ על הכפתורים מטה לניתוח מעמיק וקבלת המלצות מפורטות.</p>
+        # </div>
+        # """.format(
+        #     "#2e7d32" if risc_status == "מעל הממוצע הארצי" else "#d32f2f",
+        #     risc_status,
+        #     "#2e7d32" if ici_status == "מעל הממוצע הארצי" else "#d32f2f",
+        #     ici_status,
+        #     worst_measure,
+        #     worst_statement,
+        #     strongest_perspective[0],  # שם הממד החזק ביותר
+        #     "#2e7d32" if strongest_perspective[1]["value"] > strongest_perspective[1]["avg"] else "#d32f2f",  # צבע לממד החזק
+        #     strongest_status,  # סטטוס הממד החזק
+        #     weakest_perspective[0],  # שם הממד החלש ביותר
+        #     "#d32f2f" if weakest_perspective[1]["value"] < weakest_perspective[1]["avg"] else "#2e7d32",  # צבע לממד החלש
+        #     weakest_status  # סטטוס הממד החלש
+        # ), unsafe_allow_html=True)
 
 
 # יצירת משתני מצב אם לא קיימים
@@ -225,7 +345,7 @@ if selected_school and not filtered_df.empty:
             "research_avg": st.session_state.research_average["ici"]
         }
     st.session_state.graph_data["spider"] = {
-            "future_negetive_past": {
+            "future_negetive_past": { 
                 "current": school_info.future_negetive_past,
                 "global": st.session_state.global_average["future_negetive_past"],
                 "research": st.session_state.research_average["future_negetive_past"]
@@ -263,44 +383,42 @@ if selected_school and not filtered_df.empty:
             if st.session_state.show_explanations["combined"] and not st.session_state.explanations["combined"]:
                 combined_placeholder = st.empty()
                 combined_placeholder.markdown("מייצר ניתוח מקיף...")
+                
+                ""
+    # קבלת טקסט המתאר את מצב בית הספר בכל מדד ביחס לממוצע הארצי
+            ici_text = school_info.return_text_from_round_delta("ici")
+            risc_text = school_info.return_text_from_round_delta("risc")
+            future_negetive_past_text = school_info.return_text_from_round_delta("future_negetive_past")
+            future_positive_past_text = school_info.return_text_from_round_delta("future_positive_past")
+            future_fatalic_present_text = school_info.return_text_from_round_delta("future_fatalic_present")
+            future_hedonistic_present_text = school_info.return_text_from_round_delta("future_hedonistic_present")
+            future_future_text = school_info.return_text_from_round_delta("future_future")
+    #
+    # # יצירת פרומפט למודל השפה
+    # prompt = f"""
+    
+    # """
                   # יצירת פרומפט מסכם לכל הגרפים
-                summary_prompt = f"""
+            summary_prompt = f"""
                 נתח את הנתונים הבאים של בית הספר {selected_school} ותן הסבר כולל על המשמעות שלהם:
                 
-                1. חוסן (RISC): 
-                   ערך נוכחי: {st.session_state.graph_data.get('risc', {}).get('value', 'חסר')}
-                   ממוצע ארצי: {st.session_state.graph_data.get('risc', {}).get('global_avg', 'חסר')}
-                
-                2. מיקוד שליטה פנימי (ICI):
-                   ערך נוכחי: {st.session_state.graph_data.get('ici', {}).get('value', 'חסר')}
-                   ממוצע ארצי: {st.session_state.graph_data.get('ici', {}).get('global_avg', 'חסר')}
-                
-                3. תפיסות זמן:
-                   א. התמקדות בחוויות טראומתיות מהעבר 
-                      ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_negetive_past', {}).get('current', 'חסר')}
-                      ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_negetive_past', {}).get('global', 'חסר')}
-                   
-                   ב. התמקדות בזכרונות חיוביים מהעבר: 
-                      ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_positive_past', {}).get('current', 'חסר')}
-                      ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_positive_past', {}).get('global', 'חסר')}
-                   
-                   ג.תחושה של חוסר שליטה על העתיד 
-                      ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_fatalic_present', {}).get('current', 'חסר')}
-                      ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_fatalic_present', {}).get('global', 'חסר')}
-                   
-                   ד.חיים והתמקדות בהווה ובהנאות של כאן ועכשיו גם במחיר ויתור על העתיד 
-                      ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_hedonistic_present', {}).get('current', 'חסר')}
-                      ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_hedonistic_present', {}).get('global', 'חסר')}
-                   
-                   ה. תכנון לטווח הארוך והסתכלות קדימה: 
-                      ערך נוכחי: {st.session_state.graph_data.get('spider', {}).get('future_future', {}).get('current', 'חסר')}
-                      ממוצע ארצי: {st.session_state.graph_data.get('spider', {}).get('future_future', {}).get('global', 'חסר')}
-                
-                התייחס למשמעות המשולבת של כל המדדים והקשר ביניהם. תן ניתוח מעמיק של תפיסות הזמן והשפעתן על המדדים האחרים. תן שאלות מנחות למנהל בית הספר שיעזרו לו לשפר את המצב.
+                   אני מנהל/ת בית ספר ואני רוצה לקבל סיכום קצר וברור של מצב בית הספר שלי ביחס לממוצע הארצי,
+                בהתבסס על הנתונים הבאים:
+                הצג את הנתונים הבאים בצורה ברורה ומסודרת:
+    
+    1. מיקוד שליטה פנימי (ICI): {ici_text}
+    2. חוסן (RISC): {risc_text}
+    3. התמקדות בטראומות עבר (future_negetive_past): {future_negetive_past_text}
+    4. התמקדות בזיכרונות חיוביים (future_positive_past): {future_positive_past_text}
+    5. תחושת חוסר שליטה בעתיד (future_fatalic_present): {future_fatalic_present_text}
+    6. חיים בהווה (future_hedonistic_present): {future_hedonistic_present_text}
+    7. תכנון לטווח ארוך (future_future): {future_future_text}
+    
+               התייחס למשמעות המשולבת של כל המדדים והקשר ביניהם. תן ניתוח מעמיק של תפיסות הזמן והשפעתן על המדדים האחרים. תן שאלות מנחות למנהל בית הספר שיעזרו לו לשפר את המצב.
                 """
                 
                 # מערכת פרומפט לניתוח מסכם           
-                system_prompt = """אתה יועץ חינוכי מומחה בניתוח נתונים פסיכולוגיים של תלמידים. 
+            system_prompt = """אתה יועץ חינוכי מומחה בניתוח נתונים פסיכולוגיים של תלמידים. 
                 הסבר בבקשה את המשמעות המשולבת של כל המדדים הבאים עבור בית הספר והקשר ביניהם.
                 
                 מדד החוסן (RISC) - מודד את יכולת התלמידים להתמודד עם אתגרים ומצבי לחץ. ערכים גבוהים מעידים על חוסן גבוה.
@@ -322,7 +440,7 @@ if selected_school and not filtered_df.empty:
                 לדוגמה: 'איך כיום בית הספר מעודד תלמידים להרגיש בעלות על המעשים שלהם?', 'האם יש מקומות נוספים שהיית משלב יכולת לקחת בעלות על הצלחות או כשלונות ומידת ההשפעה האישית של התלמיד עליהן?'
                 """
                 
-                try:
+            try:
                     # קריאה למודל השפה לקבלת הסבר מסכם
                     response_stream = openai_client.chat.completions.create(
                         model="gpt-4o",
@@ -351,7 +469,7 @@ if selected_school and not filtered_df.empty:
                     # שמירת ההסבר המסכם
                     st.session_state.explanations["combined"] = full_explanation
                     
-                except Exception as e:
+            except Exception as e:
                     error_msg = f"לא הצלחנו לייצר ניתוח מקיף. שגיאה: {str(e)}"
                     combined_placeholder.error(error_msg)
                     st.session_state.explanations["combined"] = error_msg
@@ -712,3 +830,71 @@ if st.button("הצג לי גרפים") or st.session_state.show_graphs_state:
                 "research": st.session_state.research_average["future_future"]
             }
         }
+# # כפתור להצגת סיכום טקסטואלי בהתבסס על return_text_from_round_delta
+# if st.button("הצג סיכום טקסטואלי על המדדים", key="text_summary_button"):
+#     if selected_school and not filtered_df.empty:
+#         summary_placeholder = st.empty()
+#         summary_placeholder.markdown("מכין סיכום טקסטואלי...")
+        
+#         try:
+#             # יצירת אובייקט SchoolInfo חדש
+#             updated_school_info = SchoolInfo(filtered_df)
+            
+#             # קבלת הטקסט מהמתודה return_text_from_round_delta עבור כל מדד
+#             ici_text = updated_school_info.return_text_from_round_delta("ici")
+#             risc_text = updated_school_info.return_text_from_round_delta("risc")
+#             future_negetive_past_text = updated_school_info.return_text_from_round_delta("future_negetive_past")
+#             future_positive_past_text = updated_school_info.return_text_from_round_delta("future_positive_past")
+#             future_fatalic_present_text = updated_school_info.return_text_from_round_delta("future_fatalic_present")
+#             future_hedonistic_present_text = updated_school_info.return_text_from_round_delta("future_hedonistic_present")
+#             future_future_text = updated_school_info.return_text_from_round_delta("future_future")
+            
+#             # יצירת סיכום HTML
+#             summary_html = f"""
+#             <div style="background-color: #f5f5f5; padding: 20px; border-radius: 10px; margin-top: 20px; margin-bottom: 20px; direction: rtl; text-align: right;">
+#                 <h2 style="color: #1565c0; text-align: center; margin-bottom: 20px;">סיכום מצב בית הספר {selected_school} ביחס לממוצע הארצי</h2>
+                
+#                 <div style="margin-bottom: 15px;">
+#                     <h3 style="color: #333; margin-bottom: 5px;">מדדים מרכזיים:</h3>
+#                     <ul style="list-style-type: none; padding-right: 10px;">
+#                         <li style="margin-bottom: 8px;"><strong>מיקוד שליטה פנימי (ICI):</strong> <span style="color: {get_color_for_text(ici_text)};">{ici_text}</span></li>
+#                         <li style="margin-bottom: 8px;"><strong>חוסן (RISC):</strong> <span style="color: {get_color_for_text(risc_text)};">{risc_text}</span></li>
+#                     </ul>
+#                 </div>
+                
+#                 <div style="margin-bottom: 15px;">
+#                     <h3 style="color: #333; margin-bottom: 5px;">תפיסות זמן:</h3>
+#                     <ul style="list-style-type: none; padding-right: 10px;">
+#                         <li style="margin-bottom: 8px;"><strong>התמקדות בחוויות טראומתיות מהעבר:</strong> <span style="color: {get_color_for_text(future_negetive_past_text)};">{future_negetive_past_text}</span></li>
+#                         <li style="margin-bottom: 8px;"><strong>התמקדות בזכרונות חיוביים מהעבר:</strong> <span style="color: {get_color_for_text(future_positive_past_text)};">{future_positive_past_text}</span></li>
+#                         <li style="margin-bottom: 8px;"><strong>תחושה של חוסר שליטה על העתיד:</strong> <span style="color: {get_color_for_text(future_fatalic_present_text)};">{future_fatalic_present_text}</span></li>
+#                         <li style="margin-bottom: 8px;"><strong>חיים והתמקדות בהווה ובהנאות של כאן ועכשיו:</strong> <span style="color: {get_color_for_text(future_hedonistic_present_text)};">{future_hedonistic_present_text}</span></li>
+#                         <li style="margin-bottom: 8px;"><strong>תכנון לטווח הארוך והסתכלות קדימה:</strong> <span style="color: {get_color_for_text(future_future_text)};">{future_future_text}</span></li>
+#                     </ul>
+#                 </div>
+                
+#                 <div style="margin-top: 20px; font-style: italic; color: #555; text-align: center;">
+#                     הנתונים מבוססים על השוואה לממוצע הארצי של כלל בתי הספר שהשתתפו במחקר.
+#                 </div>
+#             </div>
+#             """
+            
+#             # הצגת הסיכום
+#             summary_placeholder.markdown(summary_html, unsafe_allow_html=True)
+            
+#         except Exception as e:
+#             error_msg = f"לא הצלחנו לייצר סיכום טקסטואלי. שגיאה: {str(e)}"
+#             summary_placeholder.error(error_msg)
+#     else:
+#         st.error("לא נבחר בית ספר או שאין נתונים זמינים.")
+
+# # פונקציה להגדרת צבע על פי סוג הטקסט
+# def get_color_for_text(text):
+#     if "מעל" in text or "גבוה" in text:
+#         return "#2e7d32"  # ירוק
+#     elif "מתחת" in text or "נמוך" in text:
+#         return "#d32f2f"  # אדום
+#     else:
+#         return "#757575"  # אפור
+
+
