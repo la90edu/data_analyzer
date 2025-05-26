@@ -87,7 +87,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 # אזור בחירת בית הספר בראש העמוד
-st.markdown('<div class="school-selector">', unsafe_allow_html=True)
+# st.markdown('<div class="school-selector">', unsafe_allow_html=True)
 st.markdown("<h3 style='margin-bottom: 15px;'>בחר/י בית ספר לניתוח</h3>", unsafe_allow_html=True)
 
 if not df.empty and 'school' in df.columns:
@@ -164,6 +164,7 @@ if selected_school and not filtered_df.empty:
 
     הצג בדיוק 2 שאלות. כל שאלה צריכה להיות קצרה (2-3 שורות לכל היותר), ממוקדת וברורה.
     לא להוסיף שום טקסט מעבר לשאלות עצמן.
+    אל תכתוב את מספרי השאלות.
     """
 
     try:
@@ -432,7 +433,6 @@ if selected_school and not filtered_df.empty:
                 4. חיים והתמקדות בהווה ובהנאות של כאן ועכשיו גם במחיר ויתור על העתיד - תפיסת הווה הדוניסטית, חיפוש הנאות מיידיות וחוסר תכנון. ערך גבוה מעיד על התמקדות בסיפוקים מיידיים.
                 5. תכנון לטווח הארוך והסתכלות קדימה - יכולת תכנון קדימה, דחיית סיפוקים, הצבת מטרות. ערך גבוה מעיד על אוריינטציה לעתיד ויכולת תכנון.
                 
-                חשוב לציין שאיזון בין הממדים חשוב מאוד להצלחה. לדוגמה, אוריינטציית עתיד גבוהה מקושרת עם הישגים אקדמיים, בעוד שעבר שלילי גבוה מקושר עם דיכאון וחרדה. 
                 
                 בניתוח שלך, התייחס למשמעות של אחוזים גבוהים ונמוכים בכל מדד ולהשפעה ההדדית ביניהם. התייחס גם לאיזון בין המדדים השונים.
                 
@@ -761,8 +761,15 @@ if st.button("הצג לי גרפים") or st.session_state.show_graphs_state:
         
             # הוספת הסבר קצר לגרף חוסן
         st.markdown("""
-        <div style="direction: rtl; text-align: right; margin-bottom: 30px;">
-            <p>"ניתן לראות כאן את המדדים שלך . בירוק אפשר לראות את הממוצע בבית הספר שלך, הקו הצהוב מציג את הממוצע על פי המחקר שנעשה ברובו בארה"ב ואילו הקו הכחול את הממוצע הארצי של כלל בתי הספר שלקחו חלק במחקר. ניתן ללמוד עוד על הנתונים בלחיצה על הכפתור של "הראה לי ניתוח מקיף.</p>
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 30px; direction: rtl; text-align: right;">
+            <h4 style="color: #2c3e50; margin-bottom: 10px;">איך לקרוא את הגרפים?</h4>
+            <p>הגרפים מציגים את הנתונים של בית הספר שלך בהשוואה לממוצעים חשובים:</p>
+            <ul style="list-style-type: none; padding-right: 0; margin-top: 10px;">
+            <li style="margin-bottom: 5px;">🟢 <strong>קו ירוק</strong> - הממוצע בבית הספר שלך</li>
+            <li style="margin-bottom: 5px;">🔵 <strong>קו כחול</strong> - הממוצע הארצי של בתי הספר שהשתתפו במחקר</li>
+            <li style="margin-bottom: 5px;">🟠 <strong>קו כתום</strong> - הממוצע במחקר הבינלאומי (בעיקר מארה"ב)</li>
+            </ul>
+            <p style="margin-top: 10px;">לניתוח מעמיק של הנתונים, לחצו על כפתור "הראה לי ניתוח מקיף".</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -792,8 +799,13 @@ if st.button("הצג לי גרפים") or st.session_state.show_graphs_state:
              # הוספת הסבר קצר לגרף עכביש
         st.markdown("""
         <div style="direction: rtl; text-align: right; margin-bottom: 30px;">
-            <p>ניתן לראות כאן את פרופיל בית הספר ביחס לתפיסת הזמן כאשר כל אחד מהצירים מייצג את אחת מתפיסות הזמן.
-            "הגרף הירוק מציג את הממוצע בבית הספר שלך, הקו הצהוב מציג את הממוצע על פי המחקר שנעשה ברובו בארה"ב ואילו הקו הכחול את הממוצע הארצי של כלל בתי הספר שלקחו חלק במחקר. ניתן ללמוד עוד על הנתונים בלחיצה על הכפתור של "הראה לי ניתוח מקיף.</p>
+            <p>גרף זה מציג את פרופיל תפיסת הזמן של בית הספר שלך, כאשר כל ציר מייצג ממד זמן אחר.</p>
+            <ul style="list-style-type: none; padding-right: 0;">
+            <li>🟢 <strong>הקו הירוק</strong> - הממוצע בבית הספר שלך</li>
+            <li>🔵 <strong>הקו הכחול</strong> - הממוצע הארצי של בתי הספר שהשתתפו במחקר</li>
+            <li>🟠 <strong>הקו הכתום</strong> - הממוצע במחקר הבינלאומי (בעיקר מארה"ב)</li>
+            </ul>
+            <p>למידע מעמיק יותר, לחצו על כפתור "הראה לי ניתוח מקיף".</p>
         </div>
         """, unsafe_allow_html=True)
         fig_spider = school_info.get_fig_spider()
