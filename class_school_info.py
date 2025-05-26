@@ -6,7 +6,8 @@ from graph_manager import Gauge_Graph_type, Spider_Graph_type
 import streamlit as st   
 import texts               
 
-class SchoolInfo:  def __init__(self,df):
+class SchoolInfo:
+  def __init__(self,df):
     self.df = df
     self.ici=self.round_number(anigmas.ici_result(df))
     self.risc=self.round_number(anigmas.risc_result(df))
@@ -22,22 +23,16 @@ class SchoolInfo:  def __init__(self,df):
     self.best_anigma=self.return_biggest_delata_from_global_negetive_best_anigma()[0]
     self.best_anigma_value=self.round_number(self.return_biggest_delata_from_global_negetive_best_anigma()[1])
     self.best_anigma_name=texts.return_translate_anigma_name(self,self.best_anigma)
-    
-    # Get worst heg text and handle potential issues
-    worst_heg_result = self.return_first_and_second_worst_heg_according_to_wrost_anigma()
-    if worst_heg_result and len(worst_heg_result) >= 1:
-        self.worst_heg1_text = worst_heg_result[0]
-    else:
-        self.worst_heg1_text = "לא נמצא היגד בעייתי"
+    self.worst_heg1_text= self.return_first_and_second_worst_heg_according_to_wrost_anigma()[0]
     
     self.round_delta_as_dict=self.return_round_delta_from_global_as_dict()
-    self.ici_delta_present=self.return_text_from_round_delta("ici")
-    self.risc_delta_present=self.return_text_from_round_delta("risc")
-    self.future_negetive_past_delta_present=self.return_text_from_round_delta("future_negetive_past")
-    self.future_positive_past_delta_present=self.return_text_from_round_delta("future_positive_past")
-    self.future_fatalic_present_delta_present=self.return_text_from_round_delta("future_fatalic_present")
-    self.future_hedonistic_present_delta_present=self.return_text_from_round_delta("future_hedonistic_present")
-    self.future_future_delta_present=self.return_text_from_round_delta("future_future")
+    self.ici_delta_present=self.return_int_from_round_delta("ici")
+    self.risc_delta_present=self.return_int_from_round_delta("risc")
+    self.future_negetive_past_delta_present=self.return_int_from_round_delta("future_negetive_past")
+    self.future_positive_past_delta_present=self.return_int_from_round_delta("future_positive_past")
+    self.future_fatalic_present_delta_present=self.return_int_from_round_delta("future_fatalic_present")
+    self.future_hedonistic_present_delta_present=self.return_int_from_round_delta("future_hedonistic_present")
+    self.future_future_delta_present=self.return_int_from_round_delta("future_future")
       
  
   def return_exact_precent_delta(self,anigma_name):
@@ -45,7 +40,7 @@ class SchoolInfo:  def __init__(self,df):
       return delta*100
 
 
-  def return_text_from_round_delta(self,anigma_name):
+  def return_int_from_round_delta(self,anigma_name):
       delta=self.round_delta_as_dict[anigma_name]
       
       if delta>=3:
