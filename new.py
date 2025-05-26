@@ -380,9 +380,11 @@ if selected_school and not filtered_df.empty:
     if st.button("הראה לי ניתוח מקיף", key="show_combined_explanation"):
             st.session_state.show_explanations["combined"] = not st.session_state.show_explanations["combined"]
             
+            # מאתחל placeholder מחוץ לתנאי כדי שיהיה זמין גם בבלוק הטיפול בשגיאות
+            combined_placeholder = st.empty()
+            
             # אם צריך להציג הסבר מסכם וההסבר ריק - קבל הסבר חדש
             if st.session_state.show_explanations["combined"] and not st.session_state.explanations["combined"]:
-                combined_placeholder = st.empty()
                 combined_placeholder.markdown("מייצר ניתוח מקיף...")
                 
                 ""
@@ -439,40 +441,38 @@ if selected_school and not filtered_df.empty:
                 סיים את ההסבר בשאלות מנחות למנהל בית הספר שיכולות לעודד אותו לחשוב על שיפור המצב שלו.
                 לדוגמה: 'איך כיום בית הספר מעודד תלמידים להרגיש בעלות על המעשים שלהם?', 'האם יש מקומות נוספים שהיית משלב יכולת לקחת בעלות על הצלחות או כשלונות ומידת ההשפעה האישית של התלמיד עליהן?'
                 """
-                
             try:
-                    # קריאה למודל השפה לקבלת הסבר מסכם
-                    response_stream = openai_client.chat.completions.create(
-                        model="gpt-4o",
-                        messages=[
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": summary_prompt}
-                        ],
-                        temperature=0.5,
-                        max_tokens=1500,
-                        stream=True
-                    )
-                    
-                    full_explanation = ""
-                    
-                    # עדכון תוכן ההסבר בזמן קבלת תשובות מהמודל
-                    for chunk in response_stream:
-                        if chunk.choices and hasattr(chunk.choices[0], "delta") and hasattr(chunk.choices[0].delta, "content"):
-                            content = chunk.choices[0].delta.content
-                            if content:
-                                full_explanation += content
-                                combined_placeholder.markdown(full_explanation + "▌")
-                    
-                    # תצוגה סופית של ההסבר המלא
-                    combined_placeholder.markdown(full_explanation)
-                    
-                    # שמירת ההסבר המסכם
-                    st.session_state.explanations["combined"] = full_explanation
-                    
+                # קריאה למודל השפה לקבלת הסבר מסכם
+                response_stream = openai_client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": summary_prompt}
+                    ],
+                    temperature=0.5,
+                    max_tokens=1500,
+                    stream=True
+                )
+                
+                full_explanation = ""
+                
+                # עדכון תוכן ההסבר בזמן קבלת תשובות מהמודל
+                for chunk in response_stream:
+                    if chunk.choices and hasattr(chunk.choices[0], "delta") and hasattr(chunk.choices[0].delta, "content"):
+                        content = chunk.choices[0].delta.content
+                        if content:
+                            full_explanation += content
+                            combined_placeholder.markdown(full_explanation + "▌")
+                
+                # תצוגה סופית של ההסבר המלא
+                combined_placeholder.markdown(full_explanation)
+                
+                # שמירת ההסבר המסכם
+                st.session_state.explanations["combined"] = full_explanation
             except Exception as e:
-                    error_msg = f"לא הצלחנו לייצר ניתוח מקיף. שגיאה: {str(e)}"
-                    combined_placeholder.error(error_msg)
-                    st.session_state.explanations["combined"] = error_msg
+                error_msg = f"לא הצלחנו לייצר ניתוח מקיף. שגיאה: {str(e)}"
+                combined_placeholder.error(error_msg)
+                st.session_state.explanations["combined"] = error_msg
     
     # הוספת כפתור להצגת המלצות שיפור ספציפיות
     if st.button("במה הכי כדאי לי להשתפר", key="improvement_recommendation"):
