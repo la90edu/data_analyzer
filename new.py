@@ -148,6 +148,7 @@ if selected_school and not filtered_df.empty:
     6. חיים בהווה: {future_hedonistic_present_text}
     7. תכנון לטווח ארוך: {future_future_text}
 
+
     יצר בדיוק 2 שאלות עמוקות וממוקדות שיעזרו למנהל/ת בית הספר לחשוב על דרכים לשפר את המדדים האלה.
     השאלות צריכות להיות ממוקדות בתחומים הדורשים את השיפור הרב ביותר.
     """
@@ -187,7 +188,7 @@ if selected_school and not filtered_df.empty:
         # הצגת השאלות בפורמט דומה לסיכום המדדים
         st.markdown(f"""
         <div style="background-color: #f5f9ff; padding: 15px; border-radius: 10px; margin: 10px 0; direction: rtl; text-align: right;">
-            <h4 style="color: #2c3e50; margin-bottom: 10px;">🤔 שאלות לחשיבה:</h4>
+            <h4 style="color: #2c3e50; margin-bottom: 10px;">🤔 מתוך הנתונים שאספנו, אלו שאלות שכדאי לחשוב עליהן:</h4>
             <ul style="list-style-type: none; padding-right: 10px;">
                 <li><strong>שאלה 1:</strong> {questions[0] if len(questions) > 0 else ""}</li>
                 <li><strong>שאלה 2:</strong> {questions[1] if len(questions) > 1 else ""}</li>
@@ -475,7 +476,7 @@ if selected_school and not filtered_df.empty:
                 st.session_state.explanations["combined"] = error_msg
     
     # הוספת כפתור להצגת המלצות שיפור ספציפיות
-    if st.button("במה הכי כדאי לי להשתפר", key="improvement_recommendation"):
+    if st.button("אילו מסקנות אני יכול/ה לקחת מתוך המחקר", key="improvement_recommendation"):
         # יצירת משתנה מצב להמלצות שיפור אם לא קיים
         if "improvement_recommendation" not in st.session_state.explanations:
             st.session_state.explanations["improvement_recommendation"] = ""
