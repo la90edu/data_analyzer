@@ -759,7 +759,13 @@ if st.button("הסבר לי עוד על המדדים"):
 if st.button("הצג לי גרפים") or st.session_state.show_graphs_state:
         # עדכון המצב לזכור שהגרפים הוצגו
         st.session_state.show_graphs_state = True
-        
+        # הוספת הערה על ההבדל בין גרפים לתוצאות המילוליות
+        st.markdown("""
+        <div style="background-color: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 20px; direction: rtl; text-align: right;">
+            <p style="margin: 0; color: #2c3e50;"><strong>שימו לב:</strong> ייתכנו הבדלים קלים בין התוצאות המוצגות בגרפים לבין הסיכומים המילוליים. 
+            בסיכומים המילוליים אנו מדגישים רק הבדלים משמעותיים ביחס לממוצע הארצי, בעוד שהגרפים מציגים את כל ההבדלים באופן מדויק.</p>
+        </div>
+        """, unsafe_allow_html=True)
             # הוספת הסבר קצר לגרף חוסן
         st.markdown("""
         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 30px; direction: rtl; text-align: right;">
@@ -810,7 +816,17 @@ if st.button("הצג לי גרפים") or st.session_state.show_graphs_state:
         </div>
         """, unsafe_allow_html=True)
         fig_spider = school_info.get_fig_spider()
+        # Update layout to ensure all labels are visible and chart is properly sized
+        fig_spider.update_layout(
+            height=600,  # Increase height for better label visibility
+            width=700,
+            margin=dict(l=70, r=70, t=50, b=50),  # Add margins for labels
+            autosize=False
+        )
+        
+        
         st.plotly_chart(fig_spider, use_container_width=True, key="spider_chart_1")
+        # st.plotly_chart(fig_spider, use_container_width=False, key="spider_chart_1")
 
    
 
