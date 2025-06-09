@@ -8,7 +8,8 @@ def return_translate_anigma_name(self,anigma_name):
             "future_positive_past":"התמקדות בזכרונות חיוביים מהעבר",
             "future_fatalic_present":"תחושה של חוסר שליטה על העתיד",
             "future_hedonistic_present":"חיים והתמקדות בהווה ובהנאות של כאן ועכשיו גם במחיר ויתור על העתיד",
-            "future_future":"תכנון לטווח הארוך והסתכלות קדימה"
+            "future_future":"תכנון לטווח הארוך והסתכלות קדימה",
+            "לא נמצא מדד חלש":"לא נמצא מדד חלש",
         }
         return translate_anigma_name[anigma_name]
 

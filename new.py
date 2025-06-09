@@ -100,6 +100,9 @@ else:
 
 st.markdown('</div>', unsafe_allow_html=True)
 
+# st.dataframe(filtered_df, use_container_width=True)
+if filtered_df.empty or len(filtered_df) < 10:
+    st.warning("לא נמצאו מספיק נתונים לבית הספר הנבחר. הניתוח אינו אמין.")
 
 #יצירת סיכום שיסתמכך על התוצאות שמתקבלות מ SchoolInfo.return_text_from_round_delta(ici),school_info.return_text_from_round_delta(risc) ,school_info.return_text_from_round_delta(future_negetive_past),school_info.return_text_from_round_delta(future_positive_past),school_info.return_text_from_round_delta(future_fatalic_present),school_info.return_text_from_round_delta(future_hedonistic_present),school_info.return_text_from_round_delta(future_future)
 

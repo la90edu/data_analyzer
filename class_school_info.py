@@ -121,6 +121,9 @@ class SchoolInfo:
         delta_dict=self.return_delta_from_global_as_dict()
         positive_delta_dict = {key: value for key, value in delta_dict.items() if value > 0}
 
+        # if not positive_delta_dict:
+        # # אם ה-dictionary ריק, נחזיר ערכי ברירת מחדל
+        #     return ("לא נמצא", 0)
         #finds the max key from the positive delta dict
         max_key = max(positive_delta_dict, key=positive_delta_dict.get)
         max_value = positive_delta_dict[max_key]
@@ -131,6 +134,10 @@ class SchoolInfo:
         delta_dict=self.return_delta_from_global_as_dict()
         negetive_delta_dict = {key: value for key, value in delta_dict.items() if value < 0}
         
+        if not negetive_delta_dict:
+        # אם ה-dictionary ריק, נחזיר ערכי ברירת מחדל
+            return ("לא נמצא מדד חלש", 0)
+    
         min_key = min(negetive_delta_dict, key=negetive_delta_dict.get)
         min_value = negetive_delta_dict[min_key]
         
